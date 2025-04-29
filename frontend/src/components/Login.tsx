@@ -18,11 +18,16 @@ export default function Login({ onLogin }: LoginProps) {
     })
 
     if (response.ok) {
+    const data = await response.json()
+    if (data && Object.keys(data).length > 0) {
       onLogin()
     } else {
       alert('Usuário ou senha inválidos')
     }
+  } else {
+    alert('Erro ao conectar com o servidor')
   }
+}
 
   return (
     <form
