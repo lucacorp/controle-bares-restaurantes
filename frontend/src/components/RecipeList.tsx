@@ -1,46 +1,48 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ReceitaForm from "./components/RecipeForm";
-import { ReceitaDTO, Produto } from "./types"; // tipos extraídos para um arquivo separado
+import ReceitaForm from "./ReceitaForm";
+
+interface ReceitaItemDTO {
+  produtoId: number;
+  quantidade: number;
+}
+
+interface ReceitaDTO {
+  id: number;
+  nome: string;
+  adicional: number;
+  produtoFinalId: number;
+  itens: ReceitaItemDTO[];
+}
+
+interface Produto {
+  id: number;
+  nome: string;
+}
 
 export default function ReceitaList() {
   const [receitas, setReceitas] = useState<ReceitaDTO[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [receitaEditando, setReceitaEditando] = useState<number | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     carregarDados();
   }, []);
 
   const carregarDados = async () => {
-    setLoading(true);
-    try {
-      const [receitasRes, produtosRes] = await Promise.all([
-        axios.get("/api/receitas"),
-        axios.get("/api/produtos"),
-      ]);
-      setReceitas(receitasRes.data);
-      setProdutos(produtosRes.data);
-    } catch (error) {
-      alert("Erro ao carregar dados.");
-    } finally {
-      setLoading(false);
-    }
+    const [receitasRes, produtosRes] = await Promise.all([
+      axios.get("/api/receitas"),
+      axios.get("/api/produtos"),
+    ]);
+    setReceitas(receitasRes.data);
+    setProdutos(produtosRes.data);
   };
 
   const excluirReceita = async (id: number) => {
     if (window.confirm("Deseja excluir esta receita?")) {
-      setLoading(true);
-      try {
-        await axios.delete(`/api/receitas/${id}`);
-        await carregarDados();
-      } catch {
-        alert("Erro ao excluir receita.");
-      } finally {
-        setLoading(false);
-      }
+      await axios.delete(`/api/receitas/${id}`);
+      carregarDados();
     }
   };
 
@@ -59,19 +61,12 @@ export default function ReceitaList() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div>
       <h2>Receitas</h2>
-      <button onClick={abrirNovo} style={{ marginBottom: "1rem" }}>
-        + Nova Receita
-      </button>
-
-      {loading && <p>Carregando...</p>}
+      <button onClick={abrirNovo}>+ Nova Receita</button>
 
       {showForm && (
-        <div style={{ border: "1px solid #ccc", padding: 16, marginBottom: "1rem" }}>
-          <button onClick={() => setShowForm(false)} style={{ float: "right" }}>
-            ✖ Fechar
-          </button>
+        <div style={{ border: "1px solid #ccc", padding: 16, margin: "1rem 0" }}>
           <ReceitaForm
             receitaId={receitaEditando}
             onSuccess={() => {
@@ -82,7 +77,7 @@ export default function ReceitaList() {
         </div>
       )}
 
-      <table style={{ borderCollapse: "collapse", width: "100%" }} border={1} cellPadding={8}>
+      <table border={1} cellPadding={8}>
         <thead>
           <tr>
             <th>Nome</th>
@@ -96,21 +91,21 @@ export default function ReceitaList() {
           {receitas.map((r) => (
             <tr key={r.id}>
               <td>{r.nome}</td>
-              <td>{getNomeProduto(r.produtoFinalId)} (ID {r.produtoFinalId})</td>
+              <td>
+                {getNomeProduto(r.produtoFinalId)} (ID {r.produtoFinalId})
+              </td>
               <td>{r.adicional.toFixed(2)}%</td>
               <td>
                 <ul>
                   {r.itens.map((item, idx) => (
-                    <li key={idx} title={`ID ${item.produtoId}`}>
+                    <li key={idx}>
                       {getNomeProduto(item.produtoId)}: {item.quantidade}
                     </li>
                   ))}
                 </ul>
               </td>
               <td>
-                <button onClick={() => abrirEdicao(r.id)} style={{ marginRight: 8 }}>
-                  Editar
-                </button>
+                <button onClick={() => abrirEdicao(r.id)}>Editar</button>{" "}
                 <button onClick={() => excluirReceita(r.id)}>Excluir</button>
               </td>
             </tr>

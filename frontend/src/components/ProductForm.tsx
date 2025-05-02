@@ -8,6 +8,7 @@ export default function ProductForm() {
     nome: '',
     descricao: '',
     grupo: '',
+    tipo: '',
     categoria: '',
     unidade: '',
     preco: '',
@@ -139,6 +140,24 @@ export default function ProductForm() {
       className="bg-white p-6 rounded shadow-md max-w-5xl mx-auto mt-10"
     >
       <h2 className="text-2xl font-bold mb-6">{id ? 'Editar' : 'Cadastrar'} Produto</h2>
+	<div className="mb-4">
+  <label className="block text-gray-700 font-medium mb-2" htmlFor="tipo">
+    Tipo de Produto
+  </label>
+  <select
+    id="tipo"
+    name="tipo"
+    value={produto.tipo}
+    onChange={handleChange}
+    className="w-full border rounded px-3 py-2"
+    required
+  >
+    <option value="">Selecione</option>
+    <option value="VENDA">Venda</option>
+    <option value="INSUMO">Insumo</option>
+  </select>
+</div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input name="codigo" value={produto.codigo} readOnly placeholder="Código (gerado)" className="p-2 border rounded bg-gray-100" />

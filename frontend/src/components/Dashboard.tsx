@@ -33,6 +33,14 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         </button>
 
         <button
+          onClick={() => navigate('/receitas')}
+          className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition text-left w-full"
+        >
+          <h3 className="text-xl font-semibold mb-2">🍳 Cadastro de Receitas</h3>
+          <p className="text-gray-600">Monte receitas com insumos e adição de custos</p>
+        </button>
+
+        <button
           onClick={() => navigate('/fornecedores')}
           className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition text-left w-full"
         >
