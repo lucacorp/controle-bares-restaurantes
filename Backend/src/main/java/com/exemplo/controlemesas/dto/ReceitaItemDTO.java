@@ -1,10 +1,15 @@
 package com.exemplo.controlemesas.dto;
-
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public class ReceitaItemDTO {
-    private Long produtoId;
-    private BigDecimal quantidade;
+    
+	@NotNull(message = "Produto é obrigatório.")
+	private Long produtoId;
+    
+	@NotNull(message = "Quantidade é obrigatória.")
+    @Positive(message = "A quantidade deve ser maior que 0.")
+	private BigDecimal quantidade;
 
     public Long getProdutoId() {
         return produtoId;

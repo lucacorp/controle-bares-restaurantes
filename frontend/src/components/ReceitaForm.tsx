@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 interface ReceitaItemDTO {
   produtoId: number;
@@ -31,13 +31,17 @@ export default function ReceitaForm({ receitaId, onSuccess }: Props) {
     produtoFinalId: 0,
     itens: [{ produtoId: 0, quantidade: 1 }],
   });
+
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    axios.get("/api/produtos").then(res => setProdutos(res.data));
+    api.get("/produtos")
+      .then(res => setProdutos(res.data))
+      .catch(() => setErro("Erro ao carregar produtos"));
+
     if (receitaId) {
-      axios.get(`/api/receitas/${receitaId}`)
+      api.get(`/receitas/${receitaId}`)
         .then(res => setForm(res.data))
         .catch(() => setErro("Erro ao carregar receita"));
     }
@@ -70,11 +74,11 @@ export default function ReceitaForm({ receitaId, onSuccess }: Props) {
 
     try {
       if (form.id) {
-        await axios.put(`/api/receitas/${form.id}`, form);
+        await api.put(`/receitas/${form.id}`, form);
       } else {
-        await axios.post("/api/receitas", form);
+        await api.post("/receitas", form);
       }
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (error: any) {
       setErro(error.response?.data?.message || "Erro ao salvar receita");
     }

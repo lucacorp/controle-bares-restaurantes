@@ -9,28 +9,29 @@ import com.exemplo.controlemesas.repository.ProdutoRepository;
 import com.exemplo.controlemesas.repository.ReceitaItemRepository;
 import com.exemplo.controlemesas.repository.ReceitaRepository;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 @RequestMapping("/api/receitas")
 @CrossOrigin(origins = "*")
 public class ReceitaController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
 
     @Autowired
     private ReceitaRepository receitaRepository;
@@ -57,14 +58,14 @@ public class ReceitaController {
     }
 
     @PostMapping
-    public ResponseEntity<ReceitaDTO> criar(@RequestBody ReceitaDTO dto) {
+    public ResponseEntity<ReceitaDTO> salvar(@RequestBody @Valid ReceitaDTO dto) {
         Receita receita = fromDTO(dto);
         receita = receitaRepository.save(receita);
         return ResponseEntity.ok(toDTO(receita));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReceitaDTO> atualizar(@PathVariable Long id, @RequestBody ReceitaDTO dto) {
+    public ResponseEntity<ReceitaDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ReceitaDTO dto) {
         Optional<Receita> receitaOpt = receitaRepository.findById(id);
         if (receitaOpt.isEmpty()) return ResponseEntity.notFound().build();
 
@@ -73,13 +74,13 @@ public class ReceitaController {
         receita.setAdicional(dto.getAdicional());
 
         Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
-                .orElseThrow(() -> new RuntimeException("Produto final não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
         receita.setProdutoFinal(produtoFinal);
 
         receita.getItens().clear();
         for (ReceitaItemDTO itemDTO : dto.getItens()) {
             Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
 
             ReceitaItem item = new ReceitaItem();
             item.setProduto(produto);
@@ -123,13 +124,13 @@ public class ReceitaController {
         receita.setAdicional(dto.getAdicional());
 
         Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
-                .orElseThrow(() -> new RuntimeException("Produto final não encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
         receita.setProdutoFinal(produtoFinal);
 
         List<ReceitaItem> itens = new ArrayList<>();
         for (ReceitaItemDTO itemDTO : dto.getItens()) {
             Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
             ReceitaItem item = new ReceitaItem();
             item.setProduto(produto);
             item.setQuantidade(itemDTO.getQuantidade());

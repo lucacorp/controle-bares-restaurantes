@@ -1,122 +1,31 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import ReceitaForm from "./components/RecipeForm";
-import { ReceitaDTO, Produto } from "./types"; // tipos extraídos para um arquivo separado
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import RotaProtegida from "./components/RotaProtegida";
 
-export default function ReceitaList() {
-  const [receitas, setReceitas] = useState<ReceitaDTO[]>([]);
-  const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [receitaEditando, setReceitaEditando] = useState<number | undefined>(undefined);
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
+import ReceitaList from "./ReceitaList";
+import Login from "./Login";
 
-  useEffect(() => {
-    carregarDados();
-  }, []);
-
-  const carregarDados = async () => {
-    setLoading(true);
-    try {
-      const [receitasRes, produtosRes] = await Promise.all([
-        axios.get("/api/receitas"),
-        axios.get("/api/produtos"),
-      ]);
-      setReceitas(receitasRes.data);
-      setProdutos(produtosRes.data);
-    } catch (error) {
-      alert("Erro ao carregar dados.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const excluirReceita = async (id: number) => {
-    if (window.confirm("Deseja excluir esta receita?")) {
-      setLoading(true);
-      try {
-        await axios.delete(`/api/receitas/${id}`);
-        await carregarDados();
-      } catch {
-        alert("Erro ao excluir receita.");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const abrirEdicao = (id: number) => {
-    setReceitaEditando(id);
-    setShowForm(true);
-  };
-
-  const abrirNovo = () => {
-    setReceitaEditando(undefined);
-    setShowForm(true);
-  };
-
-  const getNomeProduto = (id: number) => {
-    return produtos.find(p => p.id === id)?.nome || `ID ${id}`;
-  };
+function App() {
+  const isAutenticado = !!localStorage.getItem("token");
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Receitas</h2>
-      <button onClick={abrirNovo} style={{ marginBottom: "1rem" }}>
-        + Nova Receita
-      </button>
-
-      {loading && <p>Carregando...</p>}
-
-      {showForm && (
-        <div style={{ border: "1px solid #ccc", padding: 16, marginBottom: "1rem" }}>
-          <button onClick={() => setShowForm(false)} style={{ float: "right" }}>
-            ✖ Fechar
-          </button>
-          <ReceitaForm
-            receitaId={receitaEditando}
-            onSuccess={() => {
-              setShowForm(false);
-              carregarDados();
-            }}
-          />
-        </div>
-      )}
-
-      <table style={{ borderCollapse: "collapse", width: "100%" }} border={1} cellPadding={8}>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Produto Final</th>
-            <th>Adicional (%)</th>
-            <th>Itens</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {receitas.map((r) => (
-            <tr key={r.id}>
-              <td>{r.nome}</td>
-              <td>{getNomeProduto(r.produtoFinalId)} (ID {r.produtoFinalId})</td>
-              <td>{r.adicional.toFixed(2)}%</td>
-              <td>
-                <ul>
-                  {r.itens.map((item, idx) => (
-                    <li key={idx} title={`ID ${item.produtoId}`}>
-                      {getNomeProduto(item.produtoId)}: {item.quantidade}
-                    </li>
-                  ))}
-                </ul>
-              </td>
-              <td>
-                <button onClick={() => abrirEdicao(r.id)} style={{ marginRight: 8 }}>
-                  Editar
-                </button>
-                <button onClick={() => excluirReceita(r.id)}>Excluir</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={isAutenticado ? <Navigate to="/" replace /> : <Login />}
+        />
+        <Route
+          path="/"
+          element={
+            <RotaProtegida isAuthenticated={isAutenticado}>
+              <ReceitaList />
+            </RotaProtegida>
+          }
+        />
+        {/* outras rotas protegidas podem ser adicionadas aqui */}
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;

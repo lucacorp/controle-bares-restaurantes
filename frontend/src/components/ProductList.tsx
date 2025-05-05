@@ -1,5 +1,6 @@
 // src/components/TableList.tsx
 import { Pencil, Trash2 } from 'lucide-react'
+import api from '../services/api'
 
 // Tipagem da Mesa
 interface Table {

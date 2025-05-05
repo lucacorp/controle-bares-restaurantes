@@ -1,9 +1,12 @@
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\AuthController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\CST.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\ControleMesasApplication.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\security\SecurityConfig.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\UsuarioController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\ReceitaRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\config\CorsConfig.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\CFOP.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\security\JwtAuthenticationFilter.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\dto\ReceitaDTO.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\dto\ReceitaItemDTO.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\ReceitaItemRepository.java
@@ -15,6 +18,7 @@ C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\m
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\CFOPController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\UsuarioRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\CSTController.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\dto\LoginDTO.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\OrigemController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Produto.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\ReceitaItem.java
@@ -24,7 +28,10 @@ C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\c
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\package-info.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\CstRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\MesaController.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\excepition\GlobalExceptionHandler.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\ProdutoController.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\security\JwtUtil.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\services\UsuarioService.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Origem.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Mesa.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Usuario.java

@@ -1,33 +1,37 @@
-import { useState } from 'react'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-interface LoginProps {
-  onLogin: () => void
-}
-
-export default function Login({ onLogin }: LoginProps) {
-  const [nome, setNome] = useState('')
-  const [senha, setSenha] = useState('')
+export default function Login() {
+  const [login, setLogin] = useState("");
+  const [senha, setSenha] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const response = await fetch('http://localhost:8080/api/usuarios/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome, senha })
-    })
+    try {
+      const response = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ login, senha }),
+      });
 
-    if (response.ok) {
-    const data = await response.json()
-    if (data && Object.keys(data).length > 0) {
-      onLogin()
-    } else {
-      alert('Usuário ou senha inválidos')
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.token) {
+          localStorage.setItem("token", data.token);
+          navigate("/"); // redireciona para a rota protegida
+        } else {
+          alert("Token inválido ou ausente.");
+        }
+      } else {
+        alert("Login ou senha inválidos.");
+      }
+    } catch (error) {
+      alert("Erro ao conectar com o servidor.");
+      console.error(error);
     }
-  } else {
-    alert('Erro ao conectar com o servidor')
-  }
-}
+  };
 
   return (
     <form
@@ -37,9 +41,9 @@ export default function Login({ onLogin }: LoginProps) {
       <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Login</h2>
       <input
         type="text"
-        placeholder="Nome de usuário"
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
+        placeholder="Usuário"
+        value={login}
+        onChange={(e) => setLogin(e.target.value)}
         className="w-full mb-4 p-2 border border-gray-300 rounded"
       />
       <input
@@ -56,5 +60,5 @@ export default function Login({ onLogin }: LoginProps) {
         Entrar
       </button>
     </form>
-  )
+  );
 }
