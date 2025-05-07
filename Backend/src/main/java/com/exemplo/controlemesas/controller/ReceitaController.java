@@ -9,6 +9,15 @@ import com.exemplo.controlemesas.repository.ProdutoRepository;
 import com.exemplo.controlemesas.repository.ReceitaItemRepository;
 import com.exemplo.controlemesas.repository.ReceitaRepository;
 
+import com.exemplo.controlemesas.dto.LoginDTO;
+import com.exemplo.controlemesas.dto.RegistroRequest;
+import com.exemplo.controlemesas.model.Usuario;
+import com.exemplo.controlemesas.repository.UsuarioRepository;
+import com.exemplo.controlemesas.security.JwtUtil;
+
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

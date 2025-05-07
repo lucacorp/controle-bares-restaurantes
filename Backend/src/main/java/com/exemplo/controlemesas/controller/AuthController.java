@@ -1,9 +1,10 @@
 package com.exemplo.controlemesas.controller;
 
+import com.exemplo.controlemesas.dto.LoginRequest;
+import com.exemplo.controlemesas.dto.RegistroRequest;
 import com.exemplo.controlemesas.model.Usuario;
 import com.exemplo.controlemesas.repository.UsuarioRepository;
 import com.exemplo.controlemesas.security.JwtUtil;
-import com.exemplo.controlemesas.dto.LoginDTO;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -34,29 +36,48 @@ public class AuthController {
 
     // Registro de novo usuário
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid Usuario usuario) {
-        if (usuarioRepository.existsByLogin(usuario.getLogin())) {
-            return ResponseEntity.badRequest().body("Login já está em uso.");
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegistroRequest registroRequest) {
+        Map<String, String> response = new HashMap<>();
+
+        if (usuarioRepository.existsByEmail(registroRequest.getEmail())) {
+            response.put("mensagem", "E-mail já está em uso.");
+            return ResponseEntity.badRequest().body(response);
         }
 
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuarioRepository.save(usuario);
+        Usuario novoUsuario = new Usuario();
+        novoUsuario.setNome(registroRequest.getNome());
+        novoUsuario.setEmail(registroRequest.getEmail());
+        novoUsuario.setSenha(passwordEncoder.encode(registroRequest.getSenha()));
 
-        return ResponseEntity.ok("Usuário registrado com sucesso.");
+        usuarioRepository.save(novoUsuario);
+
+        response.put("mensagem", "Usuário registrado com sucesso.");
+        return ResponseEntity.ok(response);
     }
 
-    // Autenticação + geração de token
+    // Login + geração de token
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginDTO loginDTO) {
-        Authentication auth = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginDTO.getLogin(), loginDTO.getSenha())
-        );
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha())
+            );
 
-        if (auth.isAuthenticated()) {
-            String token = jwtUtil.generateToken(loginDTO.getLogin());
-            return ResponseEntity.ok(Collections.singletonMap("token", token));
-        } else {
-            return ResponseEntity.status(401).body("Login ou senha inválidos.");
+            if (auth.isAuthenticated()) {
+                String token = jwtUtil.generateToken(loginRequest.getEmail());
+
+                Map<String, String> response = new HashMap<>();
+                response.put("token", token);
+                return ResponseEntity.ok(response);
+            }
+        } catch (AuthenticationException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("mensagem", "Login ou senha inválidos.");
+            return ResponseEntity.status(401).body(response);
         }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("mensagem", "Erro desconhecido.");
+        return ResponseEntity.status(500).body(response);
     }
 }

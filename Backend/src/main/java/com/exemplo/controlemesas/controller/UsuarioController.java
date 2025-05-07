@@ -1,7 +1,11 @@
 package com.exemplo.controlemesas.controller;
 
+import com.exemplo.controlemesas.dto.LoginRequest;
+import com.exemplo.controlemesas.dto.RegistroRequest;
 import com.exemplo.controlemesas.model.Usuario;
 import com.exemplo.controlemesas.repository.UsuarioRepository;
+
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +19,21 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Endpoint para login
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@RequestBody Usuario usuario) {
-        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByNomeAndSenha(usuario.getNome(), usuario.getSenha());
+    public ResponseEntity<Usuario> login(@Valid @RequestBody LoginRequest loginRequest) {
+        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmailAndSenha(loginRequest.getEmail(), loginRequest.getSenha());
         return usuarioEncontrado
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(401).build()); // 401 Unauthorized se não encontrar
+                .orElse(ResponseEntity.status(401).build()); // 401 Unauthorized
     }
 
-    // Endpoint para cadastrar novo usuário
     @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = usuarioRepository.save(usuario);
-        return ResponseEntity.status(201).body(novoUsuario); // 201 Created ao cadastrar
+    public ResponseEntity<Usuario> cadastrar(@Valid @RequestBody RegistroRequest registroRequest) {
+        Usuario novoUsuario = new Usuario();
+        novoUsuario.setNome(registroRequest.getNome());
+        novoUsuario.setEmail(registroRequest.getEmail());
+        novoUsuario.setSenha(registroRequest.getSenha()); // adicionar hash futuramente
+        Usuario salvo = usuarioRepository.save(novoUsuario);
+        return ResponseEntity.status(201).body(salvo); // 201 Created
     }
 }
