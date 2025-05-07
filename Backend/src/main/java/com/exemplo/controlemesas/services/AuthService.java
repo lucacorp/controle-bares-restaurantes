@@ -1,3 +1,18 @@
+package com.exemplo.controlemesas.services;
+
+import com.exemplo.controlemesas.dto.LoginRequest;
+import com.exemplo.controlemesas.dto.RegistroRequest;
+import com.exemplo.controlemesas.model.Usuario;
+import com.exemplo.controlemesas.repository.UsuarioRepository;
+import com.exemplo.controlemesas.security.JwtUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
+
+
 @Service
 public class AuthService {
     @Autowired
@@ -30,6 +45,7 @@ public class AuthService {
             throw new RuntimeException("Senha inválida.");
         }
 
-        return jwtUtil.gerarToken(usuario);
+        return jwtUtil.generateToken(usuario.getUsername());
+
     }
 }

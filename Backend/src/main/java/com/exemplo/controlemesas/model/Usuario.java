@@ -17,7 +17,6 @@ public class Usuario {
 
     private String senha;
 
-    // Getters e setters
     public Long getId() {
         return id;
     }
@@ -49,4 +48,9 @@ public class Usuario {
     public void setSenha(String senha) {
         this.senha = senha;
     }
-} 
+
+    // Adicionado para compatibilidade com Spring Security
+    public String getUsername() {
+        return this.email; // ou this.nome se preferir
+    }
+}

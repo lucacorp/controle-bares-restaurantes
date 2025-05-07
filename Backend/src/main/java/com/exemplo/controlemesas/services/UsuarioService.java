@@ -14,14 +14,14 @@ public class UsuarioService implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
         return User.builder()
-                .username(usuario.getUsername())
+                .username(usuario.getEmail())
                 .password(usuario.getSenha()) // deve estar encriptada
-                .roles("USER") // ou admin, etc — pode evoluir isso depois
+                .roles("USER") // ou admin, etc
                 .build();
     }
 }

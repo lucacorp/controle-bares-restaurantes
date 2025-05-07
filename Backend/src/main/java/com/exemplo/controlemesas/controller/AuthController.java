@@ -5,7 +5,6 @@ import com.exemplo.controlemesas.dto.RegistroRequest;
 import com.exemplo.controlemesas.model.Usuario;
 import com.exemplo.controlemesas.repository.UsuarioRepository;
 import com.exemplo.controlemesas.security.JwtUtil;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.AuthenticationException;
 
 import java.util.HashMap;
 import java.util.Map;

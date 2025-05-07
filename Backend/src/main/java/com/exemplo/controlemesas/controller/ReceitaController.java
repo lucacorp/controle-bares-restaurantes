@@ -9,26 +9,16 @@ import com.exemplo.controlemesas.repository.ProdutoRepository;
 import com.exemplo.controlemesas.repository.ReceitaItemRepository;
 import com.exemplo.controlemesas.repository.ReceitaRepository;
 
-import com.exemplo.controlemesas.dto.LoginDTO;
-import com.exemplo.controlemesas.dto.RegistroRequest;
-import com.exemplo.controlemesas.model.Usuario;
-import com.exemplo.controlemesas.repository.UsuarioRepository;
-import com.exemplo.controlemesas.security.JwtUtil;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-
-import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
