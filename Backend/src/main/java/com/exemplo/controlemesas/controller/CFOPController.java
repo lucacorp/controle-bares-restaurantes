@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cfop")
+@CrossOrigin(origins = "http://localhost:5173")
 public class CFOPController {
 
     @Autowired

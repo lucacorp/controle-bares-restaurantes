@@ -1,69 +1,177 @@
-// src/components/TableList.tsx
-import { Pencil, Trash2 } from 'lucide-react'
-import api from '../services/api'
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import api from '../services/api';
+import FormContainer from './FormContainer';
 
-// Tipagem da Mesa
-interface Table {
-  id: number
-  name: string
-  status: string
-}
+export default function ProductForm() {
+  const [produto, setProduto] = useState({
+    codigo: '',
+    codigo_barras: '',
+    nome: '',
+    descricao: '',
+    grupo: '',
+    tipo: '',
+    categoria: '',
+    unidade: '',
+    preco: '',
+    preco_custo: '',
+    ncm: '',
+    cfop: '',
+    cst: '',
+    origem: '',
+    aliquota_icms: '',
+    aliquota_ipi: '',
+  });
 
-// Mock de mesas (você pode futuramente buscar da API)
-const tables: Table[] = [
-  { id: 1, name: 'Mesa 1', status: 'Disponível' },
-  { id: 2, name: 'Mesa 2', status: 'Ocupada' },
-  { id: 3, name: 'Mesa 3', status: 'Reservada' }
-]
+  const [cfopList, setCfopList] = useState<{ codigo: string; descricao: string }[]>([]);
+  const [cstList, setCstList] = useState<{ codigo: string; descricao: string }[]>([]);
+  const [origemList, setOrigemList] = useState<{ codigo: string; descricao: string }[]>([]);
+  const [icmsList] = useState<string[]>(['0', '7', '12', '17', '18', '25']);
 
-// Cores de status
-const statusColors: Record<string, string> = {
-  'Disponível': 'text-green-600',
-  'Ocupada': 'text-red-600',
-  'Reservada': 'text-yellow-600'
-}
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-export default function TableList() {
-  // Funções para editar e remover mesas (por enquanto apenas alert)
-  const handleEdit = (id: number) => {
-    alert(`Editar mesa ${id}`)
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (id) {
+          const response = await api.get(`/produtos/${id}`);
+          setProduto(response.data);
+        }
 
-  const handleDelete = (id: number) => {
-    const confirmar = window.confirm(`Tem certeza que deseja remover a mesa ${id}?`)
-    if (confirmar) {
-      alert(`Mesa ${id} removida`)
+        const [cfopData, cstData, origemData] = await Promise.all([
+          api.get('/cfop'),
+          api.get('/cst'),
+          api.get('/origem'),
+        ]);
+
+        setCfopList(cfopData.data);
+        setCstList(cstData.data);
+        setOrigemList(origemData.data);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+        alert('Erro ao carregar informações.');
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+
+    if (name === 'codigo_barras') {
+      const numeric = value.replace(/\D/g, '');
+      if (numeric.length > 13) return;
+      setProduto((prev) => ({ ...prev, [name]: numeric }));
+      return;
     }
-  }
+
+    if (name === 'preco' || name === 'preco_custo') {
+      const numeric = value.replace(/[^\d]/g, '');
+      const formatted = (Number(numeric) / 100).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      setProduto((prev) => ({ ...prev, [name]: formatted }));
+      return;
+    }
+
+    if (name === 'ncm') {
+      const numeric = value.replace(/\D/g, '');
+      if (numeric.length > 8) return;
+      setProduto((prev) => ({ ...prev, [name]: numeric }));
+      return;
+    }
+
+    if (name === 'aliquota_icms' || name === 'aliquota_ipi') {
+      const sanitized = value.replace(/[^\d.]/g, '');
+      const number = parseFloat(sanitized);
+      if (!isNaN(number) && number <= 100) {
+        setProduto((prev) => ({ ...prev, [name]: sanitized }));
+      } else if (value === '') {
+        setProduto((prev) => ({ ...prev, [name]: '' }));
+      }
+      return;
+    }
+
+    setProduto((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const method = id ? 'put' : 'post';
+    const url = id ? `/produtos/${id}` : '/produtos';
+
+    try {
+      await api[method](url, produto);
+      alert(`Produto ${id ? 'atualizado' : 'cadastrado'} com sucesso!`);
+      navigate('/produtos/lista');
+    } catch (error) {
+      console.error('Erro ao salvar produto:', error);
+      alert('Erro ao salvar produto.');
+    }
+  };
 
   return (
-    <div className="mt-10 px-4 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Lista de Mesas</h2>
+    <FormContainer title={id ? 'Editar Produto' : 'Cadastrar Produto'}>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input name="codigo" value={produto.codigo} readOnly placeholder="Código" className="p-2 border rounded bg-gray-100" />
+          <input name="codigo_barras" value={produto.codigo_barras} onChange={handleChange} placeholder="Código de Barras" className="p-2 border rounded" />
+          <input name="nome" value={produto.nome} onChange={handleChange} placeholder="Nome" className="p-2 border rounded" />
+          <input name="grupo" value={produto.grupo} onChange={handleChange} placeholder="Grupo" className="p-2 border rounded" />
+          <input name="categoria" value={produto.categoria} onChange={handleChange} placeholder="Categoria" className="p-2 border rounded" />
+          <input name="unidade" value={produto.unidade} onChange={handleChange} placeholder="Unidade" className="p-2 border rounded" />
+          <input name="preco" value={produto.preco} onChange={handleChange} placeholder="Preço Venda" className="p-2 border rounded" />
+          <input name="preco_custo" value={produto.preco_custo} onChange={handleChange} placeholder="Preço Custo" className="p-2 border rounded" />
+          <textarea name="descricao" value={produto.descricao} onChange={handleChange} placeholder="Descrição" className="p-2 border rounded col-span-1 md:col-span-2" />
+          <input name="ncm" value={produto.ncm} onChange={handleChange} placeholder="NCM" className="p-2 border rounded" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {tables.map(table => (
-          <div key={table.id} className="bg-white shadow-lg rounded-2xl p-6 flex flex-col items-start gap-3">
-            <h3 className="text-xl font-semibold text-gray-700">{table.name}</h3>
-            <p className={`text-sm font-medium ${statusColors[table.status]}`}>
-              Status: {table.status}
-            </p>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => handleEdit(table.id)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-              >
-                <Pencil size={16} /> Editar
-              </button>
-              <button
-                onClick={() => handleDelete(table.id)}
-                className="flex items-center gap-1 px-3 py-1.5 border border-red-500 text-red-500 rounded hover:bg-red-100 transition"
-              >
-                <Trash2 size={16} /> Remover
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+          <select name="cfop" value={produto.cfop} onChange={handleChange} className="p-2 border rounded">
+            <option value="">CFOP</option>
+            {cfopList.map((cfop) => (
+              <option key={cfop.codigo} value={cfop.codigo}>
+                {cfop.codigo} - {cfop.descricao}
+              </option>
+            ))}
+          </select>
+
+          <select name="cst" value={produto.cst} onChange={handleChange} className="p-2 border rounded">
+            <option value="">CST</option>
+            {cstList.map((cst) => (
+              <option key={cst.codigo} value={cst.codigo}>
+                {cst.codigo} - {cst.descricao}
+              </option>
+            ))}
+          </select>
+
+          <select name="origem" value={produto.origem} onChange={handleChange} className="p-2 border rounded">
+            <option value="">Origem</option>
+            {origemList.map((origem) => (
+              <option key={origem.codigo} value={origem.codigo}>
+                {origem.codigo} - {origem.descricao}
+              </option>
+            ))}
+          </select>
+
+          <select name="aliquota_icms" value={produto.aliquota_icms} onChange={handleChange} className="p-2 border rounded">
+            <option value="">ICMS</option>
+            {icmsList.map((icms) => (
+              <option key={icms} value={icms}>
+                {icms}
+              </option>
+            ))}
+          </select>
+
+          <input name="aliquota_ipi" value={produto.aliquota_ipi} onChange={handleChange} placeholder="IPI" className="p-2 border rounded" />
+        </div>
+
+        <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700">
+          {id ? 'Atualizar' : 'Cadastrar'}
+        </button>
+      </form>
+    </FormContainer>
+  );
 }

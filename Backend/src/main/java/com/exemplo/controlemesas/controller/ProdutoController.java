@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/produtos")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ProdutoController {
 
     @Autowired
@@ -18,7 +19,7 @@ public class ProdutoController {
     @PostMapping
     public ResponseEntity<Produto> salvarProduto(@RequestBody Produto produto) {
         Produto novoProduto = produtoRepository.save(produto);
-        return ResponseEntity.status(201).body(novoProduto); // Retorna 201 Created
+        return ResponseEntity.status(201).body(novoProduto); // 201 Created
     }
 
     @GetMapping

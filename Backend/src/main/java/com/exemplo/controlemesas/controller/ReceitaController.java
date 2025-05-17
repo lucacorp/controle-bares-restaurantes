@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Validated
 @RestController
 @RequestMapping("/api/receitas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173") // 🔁 CORS mais seguro e específico
 public class ReceitaController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
@@ -41,28 +41,29 @@ public class ReceitaController {
     @Autowired
     private ReceitaItemRepository receitaItemRepository;
 
+    // Listar todas as receitas
     @GetMapping
     public List<Receita> listar() {
         return receitaRepository.findAll();
     }
 
+    // Buscar uma receita por ID
     @GetMapping("/{id}")
     public ResponseEntity<ReceitaDTO> buscarPorId(@PathVariable Long id) {
         Optional<Receita> receitaOpt = receitaRepository.findById(id);
-        if (receitaOpt.isEmpty()) return ResponseEntity.notFound().build();
-
-        Receita receita = receitaOpt.get();
-        ReceitaDTO dto = toDTO(receita);
-        return ResponseEntity.ok(dto);
+        return receitaOpt.map(receita -> ResponseEntity.ok(toDTO(receita)))
+                         .orElse(ResponseEntity.notFound().build());
     }
 
+    // Criar uma nova receita
     @PostMapping
     public ResponseEntity<ReceitaDTO> salvar(@RequestBody @Valid ReceitaDTO dto) {
         Receita receita = fromDTO(dto);
         receita = receitaRepository.save(receita);
-        return ResponseEntity.ok(toDTO(receita));
+        return ResponseEntity.status(201).body(toDTO(receita)); // 201 Created
     }
 
+    // Atualizar uma receita existente
     @PutMapping("/{id}")
     public ResponseEntity<ReceitaDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ReceitaDTO dto) {
         Optional<Receita> receitaOpt = receitaRepository.findById(id);
@@ -92,13 +93,15 @@ public class ReceitaController {
         return ResponseEntity.ok(toDTO(receita));
     }
 
+    // Deletar uma receita
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         if (!receitaRepository.existsById(id)) return ResponseEntity.notFound().build();
         receitaRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
+    // Converte de entidade para DTO
     private ReceitaDTO toDTO(Receita receita) {
         ReceitaDTO dto = new ReceitaDTO();
         dto.setId(receita.getId());
@@ -117,6 +120,7 @@ public class ReceitaController {
         return dto;
     }
 
+    // Converte de DTO para entidade
     private Receita fromDTO(ReceitaDTO dto) {
         Receita receita = new Receita();
         receita.setNome(dto.getNome());

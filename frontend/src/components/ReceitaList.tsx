@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "./axiosConfig";
 import ReceitaForm from "./ReceitaForm";
 
 interface ReceitaItemDTO {
@@ -31,17 +31,22 @@ export default function ReceitaList() {
   }, []);
 
   const carregarDados = async () => {
-    const [receitasRes, produtosRes] = await Promise.all([
-      axios.get("/api/receitas"),
-      axios.get("/api/produtos"),
-    ]);
-    setReceitas(receitasRes.data);
-    setProdutos(produtosRes.data);
+    try {
+      const [receitasRes, produtosRes] = await Promise.all([
+        api.get("/receitas"),
+        api.get("/produtos"),
+      ]);
+      setReceitas(receitasRes.data);
+      setProdutos(produtosRes.data);
+    } catch (error) {
+      console.error("Erro ao carregar dados:", error);
+      alert("Erro ao carregar dados. Faça login novamente.");
+    }
   };
 
   const excluirReceita = async (id: number) => {
     if (window.confirm("Deseja excluir esta receita?")) {
-      await axios.delete(`/api/receitas/${id}`);
+      await api.delete(`/receitas/${id}`);
       carregarDados();
     }
   };

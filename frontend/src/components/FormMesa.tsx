@@ -1,75 +1,55 @@
-// src/components/FormMesa.tsx
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-
-const statusOptions = ['Disponível', 'Ocupada', 'Reservada']
-
-type Mesa = {
-  id?: number
-  nome: string
-  status: string
-}
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import api from '../services/api';
+import FormContainer from './FormContainer';
 
 export default function FormMesa() {
-  const [mesa, setMesa] = useState<Mesa>({ nome: '', status: 'Disponível' })
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const [mesa, setMesa] = useState({ descricao: '', ocupada: false });
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
-      fetch(`http://localhost:8080/api/mesas/${id}`)
-        .then(res => res.json())
-        .then(data => setMesa(data))
+      api.get(`/mesas/${id}`)
+        .then(res => setMesa(res.data))
         .catch(err => {
-          console.error('Erro ao carregar mesa:', err)
-          alert('Erro ao carregar dados da mesa.')
-        })
+          console.error('Erro ao carregar mesa:', err);
+          alert('Erro ao carregar dados da mesa.');
+        });
     }
-  }, [id])
+  }, [id]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setMesa(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setMesa(prev => ({
+      ...prev,
+      [name]: name === 'ocupada' ? value === 'true' : value
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+    e.preventDefault();
     try {
-      const method = id ? 'PUT' : 'POST'
-      const url = id
-        ? `http://localhost:8080/api/mesas/${id}`
-        : `http://localhost:8080/api/mesas`
-
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mesa)
-      })
-
-      if (!response.ok) throw new Error('Erro ao salvar')
-
-      alert('Mesa salva com sucesso!')
-      navigate('/mesas')
+      const method = id ? 'put' : 'post';
+      const url = id ? `/mesas/${id}` : '/mesas';
+      await api[method](url, mesa);
+      alert('Mesa salva com sucesso!');
+      navigate('/mesas');
     } catch (error) {
-      console.error(error)
-      alert('Erro ao salvar a mesa.')
+      console.error(error);
+      alert('Erro ao salvar a mesa.');
     }
-  }
+  };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white shadow-md rounded-xl p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
-        {id ? 'Editar Mesa' : 'Nova Mesa'}
-      </h2>
-
+    <FormContainer title={id ? 'Editar Mesa' : 'Nova Mesa'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block font-medium mb-1">Nome da Mesa</label>
+          <label className="block font-medium mb-1">Descrição</label>
           <input
             type="text"
-            name="nome"
-            value={mesa.nome}
+            name="descricao"
+            value={mesa.descricao}
             onChange={handleChange}
             required
             className="w-full border border-gray-300 rounded px-3 py-2"
@@ -77,18 +57,15 @@ export default function FormMesa() {
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Status</label>
+          <label className="block font-medium mb-1">Ocupada?</label>
           <select
-            name="status"
-            value={mesa.status}
+            name="ocupada"
+            value={mesa.ocupada.toString()}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded px-3 py-2"
           >
-            {statusOptions.map(status => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
+            <option value="false">Não</option>
+            <option value="true">Sim</option>
           </select>
         </div>
 
@@ -108,6 +85,6 @@ export default function FormMesa() {
           </button>
         </div>
       </form>
-    </div>
-  )
+    </FormContainer>
+  );
 }

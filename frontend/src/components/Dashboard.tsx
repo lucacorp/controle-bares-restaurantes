@@ -1,14 +1,22 @@
-import { useNavigate } from 'react-router-dom'
+// src/components/Dashboard.tsx
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
-export default function Dashboard({ onLogout }: { onLogout: () => void }) {
-  const navigate = useNavigate()
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout(); // Remove token do localStorage e atualiza o estado
+    navigate("/login"); // Redireciona para login
+  };
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-start bg-gray-100 px-6 py-10">
       <div className="w-full max-w-7xl flex justify-between items-center mb-10">
         <h1 className="text-3xl font-bold">Bem-vindo ao Painel</h1>
         <button
-          onClick={onLogout}
+          onClick={handleLogout}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
         >
           Sair
@@ -25,7 +33,7 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         </button>
 
         <button
-          onClick={() => navigate('/produtos')}
+          onClick={() => navigate('/produtos/novo')}
           className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition text-left w-full"
         >
           <h3 className="text-xl font-semibold mb-2">📦 Cadastro de Produtos</h3>
@@ -57,5 +65,5 @@ export default function Dashboard({ onLogout }: { onLogout: () => void }) {
         </button>
       </div>
     </div>
-  )
+  );
 }
