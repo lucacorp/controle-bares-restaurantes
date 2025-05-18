@@ -1,26 +1,23 @@
 // src/axiosConfig.ts
-import axios from "axios";
+import axios from 'axios';
+import { logout } from "../authService";
+
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // Prefixo base para todas as requisições
+  baseURL: 'http://localhost:8080/api',
 });
 
-// Intercepta requisições para adicionar o token JWT
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Intercepta respostas para lidar com erros
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 403 || error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+  response => response,
+  error => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      logout();  // faz logout e navega para login
     }
     return Promise.reject(error);
   }

@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
+    // Só limpa token e estado aqui, sem navegação
     localStorage.removeItem("token");
     setIsAuthenticated(false);
   };

@@ -9,7 +9,7 @@ export default function FormMesa() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (id) {
+    if (id && id !== 'nova') {
       api.get(`/mesas/${id}`)
         .then(res => setMesa(res.data))
         .catch(err => {
@@ -30,8 +30,8 @@ export default function FormMesa() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const method = id ? 'put' : 'post';
-      const url = id ? `/mesas/${id}` : '/mesas';
+      const method = id && id !== 'nova' ? 'put' : 'post';
+      const url = id && id !== 'nova' ? `/mesas/${id}` : '/mesas';
       await api[method](url, mesa);
       alert('Mesa salva com sucesso!');
       navigate('/mesas');
@@ -42,7 +42,7 @@ export default function FormMesa() {
   };
 
   return (
-    <FormContainer title={id ? 'Editar Mesa' : 'Nova Mesa'}>
+    <FormContainer title={id && id !== 'nova' ? 'Editar Mesa' : 'Nova Mesa'}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block font-medium mb-1">Descrição</label>

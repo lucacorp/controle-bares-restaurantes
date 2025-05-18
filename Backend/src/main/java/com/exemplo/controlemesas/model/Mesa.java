@@ -9,6 +9,7 @@ public class Mesa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer numero;
 
     private String descricao;
 
