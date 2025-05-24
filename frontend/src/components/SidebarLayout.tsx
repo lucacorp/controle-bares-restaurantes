@@ -1,23 +1,67 @@
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-// index.tsx ou main.tsx
-
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function SidebarLayout() {
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const menuItems = [
+    { icon: "🏠", label: "Dashboard", path: "/dashboard" },
+    { icon: "🍽️", label: "Mesas", path: "/mesas" },
+    { icon: "📦", label: "Produtos", path: "/produtos" },
+    { icon: "🍳", label: "Receitas", path: "/receitas" },
+    { icon: "📊", label: "Relatórios", path: "/relatorios" },
+  ];
+
+  const toggleSidebar = () => setCollapsed(!collapsed);
+
+  // Responsividade: colapsar automaticamente em telas menores que 768px
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+
+    // Chama ao montar
+    handleResize();
+
+    // Ouvinte de resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-lg flex flex-col p-6 border-r border-gray-200">
-        <h2 className="text-3xl font-bold mb-8 text-blue-700">Painel</h2>
+      <aside
+        className={`bg-white shadow-md flex flex-col p-4 transition-all duration-300 ${
+          collapsed ? "w-20" : "w-64"
+        }`}
+      >
+        <button
+          onClick={toggleSidebar}
+          className="mb-6 focus:outline-none self-end"
+        >
+          {collapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
+        </button>
 
         <nav className="flex flex-col gap-4">
-          <SidebarButton onClick={() => navigate('/dashboard')} label="Dashboard" icon="🏠" />
-          <SidebarButton onClick={() => navigate('/mesas')} label="Mapa de Mesas" icon="🍽️" />
-          <SidebarButton onClick={() => navigate('/produtos/novo')} label="Produtos" icon="📦" />
-          <SidebarButton onClick={() => navigate('/receitas')} label="Receitas" icon="🍳" />
-          <SidebarButton onClick={() => navigate('/fornecedores')} label="Fornecedores" icon="🤝" />
-          <SidebarButton onClick={() => navigate('/relatorios')} label="Relatórios" icon="📊" />
+          {menuItems.map((item) => (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className="flex items-center gap-2 hover:text-blue-600 text-left"
+            >
+              <span>{item.icon}</span>
+              {!collapsed && <span>{item.label}</span>}
+            </button>
+          ))}
         </nav>
 
         <button
@@ -25,36 +69,18 @@ export default function SidebarLayout() {
             localStorage.removeItem("token");
             navigate("/login");
           }}
-          className="mt-auto bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition"
+          className={`mt-auto bg-red-500 text-white rounded px-4 py-2 hover:bg-red-600 ${
+            collapsed ? "text-xs p-1" : ""
+          }`}
         >
-          🚪 Sair
+          {collapsed ? "⏻" : "Sair"}
         </button>
       </aside>
 
       {/* Conteúdo principal */}
-      <main className="flex-1 p-8 bg-gray-100 overflow-y-auto">
+      <main className="flex-1 p-6">
         <Outlet />
       </main>
     </div>
-  );
-}
-
-function SidebarButton({
-  onClick,
-  label,
-  icon,
-}: {
-  onClick: () => void;
-  label: string;
-  icon: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="flex items-center gap-3 text-gray-700 text-left px-3 py-2 rounded-md hover:bg-blue-100 hover:text-blue-600 transition"
-    >
-      <span className="text-xl">{icon}</span>
-      <span className="text-base font-medium">{label}</span>
-    </button>
   );
 }

@@ -1,10 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import api from '../components/axiosConfig'; // seu axios já configurado com baseURL e token
+import api from '../services/api';
+import { Produto } from '@/types/Produto';
+import AddItemModal from '@/components/AddItemModal';
 
 interface ItemComanda {
   id: number;
-  produtoNome: string;
+  produto: Produto;
   quantidade: number;
   precoUnitario: number;
 }
@@ -12,83 +14,84 @@ interface ItemComanda {
 interface Comanda {
   id: number;
   mesaId: number;
+  status: string;
+  dataAbertura: string;
+  dataFechamento: string | null;
   total: number;
   itens: ItemComanda[];
 }
 
 export default function ComandaPage() {
   const { mesaId } = useParams<{ mesaId: string }>();
-
   const [comanda, setComanda] = useState<Comanda | null>(null);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!mesaId) {
-      setError("Mesa inválida");
+  const carregarComanda = () => {
+    const idNum = Number(mesaId);
+
+    if (isNaN(idNum) || idNum <= 0) {
+      console.error("mesaId inválido:", mesaId);
+      setError("ID da mesa inválido.");
       setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    api.get(`/comandas/mesa/${mesaId}`)
+    api.get(`/comandas/mesa/${idNum}`)
       .then(res => {
         setComanda(res.data);
         setLoading(false);
       })
       .catch(() => {
-        api.post('/comandas', { mesaId: Number(mesaId) })
+        api.post('/comandas', { mesaId: idNum })
           .then(res => {
             setComanda(res.data);
             setLoading(false);
           })
-          .catch(() => {
-            setError("Erro ao carregar comanda");
+          .catch(err => {
+            console.error("Erro ao criar comanda:", err);
+            setError("Erro ao carregar ou criar comanda.");
             setLoading(false);
           });
       });
+  };
+
+  const loadProdutos = async () => {
+    try {
+      const resp = await api.get("/produtos");
+      setProdutos(resp.data);
+    } catch (err) {
+      console.error("Erro ao carregar produtos:", err);
+    }
+  };
+
+  useEffect(() => {
+    carregarComanda();
+    loadProdutos();
   }, [mesaId]);
 
-  if (loading) return <div className="p-4 text-center">Carregando comanda...</div>;
-  if (error) return <div className="p-4 text-center text-red-600">{error}</div>;
-  if (!comanda) return <div className="p-4 text-center">Nenhuma comanda encontrada.</div>;
+  if (loading) return <div>Carregando comanda...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Comanda da Mesa #{mesaId}</h1>
-
-      <table className="w-full mb-4 border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th>Produto</th>
-            <th>Qtd</th>
-            <th>Preço Unit.</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {comanda.itens.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="text-center py-4">Nenhum item na comanda</td>
-            </tr>
-          ) : (
-            comanda.itens.map(item => (
-              <tr key={item.id}>
-                <td>{item.produtoNome}</td>
-                <td>{item.quantidade}</td>
-                <td>R$ {item.precoUnitario.toFixed(2)}</td>
-                <td>R$ {(item.quantidade * item.precoUnitario).toFixed(2)}</td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-
-      <div className="text-right font-bold text-lg">
-        Total: R$ {comanda.total.toFixed(2)}
-      </div>
+    <div>
+      <h1>Comanda Mesa #{mesaId}</h1>
+      <AddItemModal
+        produtos={produtos}
+        onAdicionar={async (produtoId, quantidade) => {
+          try {
+            await api.post("/itens-comanda", {
+              comanda: { id: comanda!.id },
+              produto: { id: produtoId },
+              quantidade
+            });
+            carregarComanda();
+          } catch (err) {
+            console.error("Erro ao adicionar item:", err);
+          }
+        }}
+      />
     </div>
   );
 }

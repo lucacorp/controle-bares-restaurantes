@@ -4,13 +4,15 @@ import { unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
 import { history } from './history';
 import App from './App';
 import { AuthProvider } from './AuthContext';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AuthProvider>
-      <HistoryRouter history={history}>
-        <App />
+    <HistoryRouter history={history}>
+		<AuthProvider>
+              <App />
+		 </AuthProvider>	  
       </HistoryRouter>
-    </AuthProvider>
+   
   </React.StrictMode>
 );

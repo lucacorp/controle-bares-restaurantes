@@ -1,42 +1,62 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { ItemComanda } from "@/types/ItemComanda";
-import { Produto } from "@/types/Produto";
-// index.tsx ou main.tsx
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import { Produto } from '@/types/Produto';
+import AddItemModal from './AddItemModal';
+
+interface ItemComandaDTO {
+  id: number;
+  produtoId: number;
+  produtoNome: string;
+  quantidade: number;
+  precoUnitario: number;
+}
 
 interface Props {
   comandaId: number;
 }
 
 export default function ItensComandaPage({ comandaId }: Props) {
-  const [itens, setItens] = useState<ItemComanda[]>([]);
+  const [itens, setItens] = useState<ItemComandaDTO[]>([]);
   const [produtos, setProdutos] = useState<Produto[]>([]);
-  const [produtoId, setProdutoId] = useState<number>(0);
-  const [quantidade, setQuantidade] = useState<number>(1);
 
   const loadItens = async () => {
-    const resp = await axios.get(`/api/itens-comanda/${comandaId}`);
-    setItens(resp.data);
+    try {
+      const resp = await api.get(`/itens-comanda/${comandaId}`);
+      setItens(Array.isArray(resp.data) ? resp.data : []);
+    } catch (err) {
+      console.error('Erro ao carregar itens:', err);
+    }
   };
 
   const loadProdutos = async () => {
-    const resp = await axios.get("/api/produtos");
-    setProdutos(resp.data);
+    try {
+      const resp = await api.get('/produtos');
+      setProdutos(Array.isArray(resp.data) ? resp.data : []);
+    } catch (err) {
+      console.error('Erro ao carregar produtos:', err);
+    }
   };
 
-  const adicionarItem = async () => {
+  const handleAdicionar = async (produtoId: number, quantidade: number) => {
     const produto = produtos.find(p => p.id === produtoId);
-    if (!produto) return;
+    if (!produto) {
+      alert('Produto inválido');
+      return;
+    }
 
-    await axios.post("/api/itens-comanda", {
-      comanda: { id: comandaId },
-      produto: { id: produtoId },
-      quantidade,
-      precoUnitario: produto.precoVenda // ou preco, conforme sua entidade
-    });
+    const precoUnitario = produto.precoVenda ?? produto.preco ?? 0;
 
-    setQuantidade(1);
-    loadItens();
+    try {
+      await api.post('/itens-comanda', {
+        comanda: { id: comandaId },
+        produto: { id: produtoId },
+        quantidade,
+        precoUnitario
+      });
+      loadItens();
+    } catch (err) {
+      console.error('Erro ao adicionar item:', err);
+    }
   };
 
   const calcularTotal = () => {
@@ -52,35 +72,9 @@ export default function ItensComandaPage({ comandaId }: Props) {
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Itens da Comanda #{comandaId}</h2>
 
-      <div className="flex gap-2 mb-4">
-        <select
-          value={produtoId}
-          onChange={e => setProdutoId(Number(e.target.value))}
-          className="border p-2 rounded"
-        >
-          <option value={0}>Selecione um produto</option>
-          {produtos.map(p => (
-            <option key={p.id} value={p.id}>{p.nome}</option>
-          ))}
-        </select>
+      <AddItemModal produtos={produtos} onAdicionar={handleAdicionar} />
 
-        <input
-          type="number"
-          min={1}
-          value={quantidade}
-          onChange={e => setQuantidade(Number(e.target.value))}
-          className="border p-2 w-20 rounded"
-        />
-
-        <button
-          onClick={adicionarItem}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Adicionar
-        </button>
-      </div>
-
-      <table className="w-full border">
+      <table className="w-full border mt-4">
         <thead>
           <tr className="bg-gray-100">
             <th>Produto</th>
@@ -92,7 +86,7 @@ export default function ItensComandaPage({ comandaId }: Props) {
         <tbody>
           {itens.map(item => (
             <tr key={item.id}>
-              <td>{item.produto?.nome || "Produto"}</td>
+              <td>{item.produtoNome}</td>
               <td>{item.quantidade}</td>
               <td>R$ {item.precoUnitario.toFixed(2)}</td>
               <td>R$ {(item.precoUnitario * item.quantidade).toFixed(2)}</td>

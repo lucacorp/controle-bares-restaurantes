@@ -29,15 +29,31 @@ export default function FormMesa() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!mesa.descricao.trim()) {
+      alert("A descrição da mesa é obrigatória.");
+      return;
+    }
+
     try {
       const method = id && id !== 'nova' ? 'put' : 'post';
       const url = id && id !== 'nova' ? `/mesas/${id}` : '/mesas';
-      await api[method](url, mesa);
+      const response = await api[method](url, mesa);
+
       alert('Mesa salva com sucesso!');
-      navigate('/mesas');
-    } catch (error) {
-      console.error(error);
-      alert('Erro ao salvar a mesa.');
+
+      const mesaSalva = response.data;
+      if (mesaSalva && mesaSalva.id) {
+        navigate(`/comandas/${mesaSalva.id}/itens`);
+      } else {
+        navigate('/mesas');
+      }
+    } catch (error: any) {
+      console.error('Erro ao salvar mesa:', error);
+      const msg =
+        error?.response?.data?.message ||
+        'Erro ao salvar a mesa.';
+      alert(msg);
     }
   };
 
@@ -60,7 +76,7 @@ export default function FormMesa() {
           <label className="block font-medium mb-1">Ocupada?</label>
           <select
             name="ocupada"
-            value={mesa.ocupada.toString()}
+            value={String(mesa.ocupada)}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded px-3 py-2"
           >

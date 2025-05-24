@@ -1,14 +1,7 @@
-// src/App.tsx
-import {
-  Routes,
-  Route,
-  Navigate,
-  useParams,
-} from "react-router-dom";
-// index.tsx ou main.tsx
-import './index.css'; // que contém @tailwind base, components, utilities
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 
-import SidebarLayout from "./components/SidebarLayout";
+import { useAuth } from "./AuthContext";
+
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import ProductList from "./components/ProductList";
@@ -19,8 +12,7 @@ import ReceitaList from "./components/ReceitaList";
 import ReceitaForm from "./components/ReceitaForm";
 import RotaProtegida from "./components/RotaProtegida";
 import ItensComandaPage from "./components/ItensComandaPage";
-import { AuthProvider, useAuth } from "./AuthContext";
-import ComandaPage from './components/ComandaPage';
+import SidebarLayout from "./components/SidebarLayout";
 
 function ItensComandaWrapper() {
   const { id } = useParams();
@@ -28,7 +20,7 @@ function ItensComandaWrapper() {
   return <ItensComandaPage comandaId={Number(id)} />;
 }
 
-function Rotas() {
+function App() {
   const { isAuthenticated } = useAuth();
 
   return (
@@ -37,21 +29,27 @@ function Rotas() {
         path="/"
         element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
       />
+
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
       />
 
-      <Route element={<RotaProtegida><SidebarLayout /></RotaProtegida>}>
+      <Route
+        element={
+          <RotaProtegida>
+            <SidebarLayout />
+          </RotaProtegida>
+        }
+      >
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/produtos" element={<ProductList />} />
         <Route path="/produtos/novo" element={<ProductForm />} />
         <Route path="/mesas" element={<TableList />} />
-        <Route path="/mesas/:id" element={<FormMesa />} />
+        <Route path="/mesas/nova" element={<FormMesa />} />
         <Route path="/receitas" element={<ReceitaList />} />
         <Route path="/receitas/nova" element={<ReceitaForm />} />
         <Route path="/comandas/:id/itens" element={<ItensComandaWrapper />} />
-        <Route path="/comanda/:mesaId" element={<ComandaPage />} />
       </Route>
 
       <Route
@@ -62,10 +60,4 @@ function Rotas() {
   );
 }
 
-export default function App() {
-  return (
-    <AuthProvider>
-      <Rotas />
-    </AuthProvider>
-  );
-}
+export default App;

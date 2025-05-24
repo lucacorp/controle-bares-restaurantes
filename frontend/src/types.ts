@@ -14,7 +14,9 @@ export interface ReceitaDTO {
 export interface Produto {
   id: number;
   nome: string;
+  precoVenda: number;
 }
+
 
 export interface ItemComanda {
   id?: number;

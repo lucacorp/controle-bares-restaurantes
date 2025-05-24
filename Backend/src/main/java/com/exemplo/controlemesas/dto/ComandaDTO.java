@@ -1,4 +1,3 @@
-// src/main/java/com/exemplo/controlemesas/dto/ComandaDTO.java
 package com.exemplo.controlemesas.dto;
 
 public class ComandaDTO {
@@ -8,7 +7,7 @@ public class ComandaDTO {
     private String dataAbertura;
     private String dataFechamento;
 
-    // Getters e setters
+    // Getters e Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

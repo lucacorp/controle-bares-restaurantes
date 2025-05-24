@@ -2,6 +2,8 @@ package com.exemplo.controlemesas.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Entity
 @Table(name = "comandas")
@@ -61,4 +63,17 @@ public class Comanda {
     public void setStatus(StatusComanda status) {
         this.status = status;
     }
+    @OneToMany(mappedBy = "comanda", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemComanda> itens;
+
+    // getter
+    public List<ItemComanda> getItens() {
+        return itens;
+    }
+
+    // setter
+    public void setItens(List<ItemComanda> itens) {
+        this.itens = itens;
+    }
+
 }

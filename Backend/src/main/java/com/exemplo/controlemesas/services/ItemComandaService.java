@@ -20,9 +20,6 @@ public class ItemComandaService {
     }
 
     public ItemComanda adicionarItem(ItemComanda itemComanda) {
-        // Você pode aplicar regras aqui, como:
-        // - validar se a comanda está aberta
-        // - buscar o preço do produto do banco (para manter consistência)
         return itemComandaRepository.save(itemComanda);
     }
 
