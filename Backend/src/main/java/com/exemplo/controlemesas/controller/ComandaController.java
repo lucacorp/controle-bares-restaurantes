@@ -3,23 +3,19 @@ package com.exemplo.controlemesas.controller;
 import com.exemplo.controlemesas.dto.ComandaDTO;
 import com.exemplo.controlemesas.dto.ErrorResponse;
 import com.exemplo.controlemesas.model.Comanda;
-import com.exemplo.controlemesas.model.ComandaResumo;
-import com.exemplo.controlemesas.model.ItemComanda;
 import com.exemplo.controlemesas.model.Mesa;
 import com.exemplo.controlemesas.repository.ComandaRepository;
-import com.exemplo.controlemesas.repository.ComandaResumoRepository;
 import com.exemplo.controlemesas.repository.MesaRepository;
-
+import com.exemplo.controlemesas.services.ComandaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,58 +31,47 @@ public class ComandaController {
     private MesaRepository mesaRepository;
 
     @Autowired
-    private ComandaResumoRepository resumoRepository;
-
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private ComandaService comandaService;  // ✅ FALTAVA ISSO!
 
     private ComandaDTO toDTO(Comanda comanda) {
         ComandaDTO dto = new ComandaDTO();
         dto.setId(comanda.getId());
         dto.setMesaId(comanda.getMesa() != null ? comanda.getMesa().getId() : null);
         dto.setStatus(comanda.getStatus().name());
-        if (comanda.getDataAbertura() != null)
-            dto.setDataAbertura(formatter.format(comanda.getDataAbertura()));
-        if (comanda.getDataFechamento() != null)
-            dto.setDataFechamento(formatter.format(comanda.getDataFechamento()));
+        dto.setDataAbertura(comanda.getDataAbertura() != null ? comanda.getDataAbertura().toString() : null);
+        dto.setDataFechamento(comanda.getDataFechamento() != null ? comanda.getDataFechamento().toString() : null);
         return dto;
     }
 
     @GetMapping
     public List<ComandaDTO> listarTodas() {
-        return comandaRepository.findAll()
-                .stream()
+        return comandaRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
-        Optional<Comanda> comandaOpt = comandaRepository.findById(id);
-        if (comandaOpt.isPresent()) {
-            return ResponseEntity.ok().body(toDTO(comandaOpt.get()));
-        } else {
-            return ResponseEntity.status(404).body(new ErrorResponse("Comanda não encontrada"));
-        }
+        return comandaRepository.findById(id)
+                .map(comanda -> ResponseEntity.ok(toDTO(comanda)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/mesa/{mesaId}")
+    public ResponseEntity<List<ComandaDTO>> listarPorMesa(@PathVariable Long mesaId) {
+        List<Comanda> comandas = comandaRepository.findByMesaId(mesaId);
+        List<ComandaDTO> dtos = comandas.stream().map(this::toDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody ComandaDTO dto) {
-        if (dto.getMesaId() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("ID da mesa é obrigatório"));
-        }
-
         Optional<Mesa> mesaOpt = mesaRepository.findById(dto.getMesaId());
         if (mesaOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Mesa não encontrada para o ID: " + dto.getMesaId()));
+            return ResponseEntity.badRequest().body(new ErrorResponse("Mesa não encontrada."));
         }
 
         Mesa mesa = mesaOpt.get();
-        if (mesa.isOcupada()) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Mesa já está ocupada"));
-        }
-
-        mesa.setOcupada(true);
-        mesaRepository.save(mesa);
 
         Comanda comanda = new Comanda();
         comanda.setMesa(mesa);
@@ -94,67 +79,19 @@ public class ComandaController {
         comanda.setStatus(Comanda.StatusComanda.ABERTA);
 
         Comanda salva = comandaRepository.save(comanda);
+
         return ResponseEntity.created(URI.create("/api/comandas/" + salva.getId())).body(toDTO(salva));
     }
 
-    @PutMapping("/{id}/fechar")
-    public ResponseEntity<?> fechar(@PathVariable Long id) {
-        Optional<Comanda> comandaOpt = comandaRepository.findById(id);
-        if (comandaOpt.isEmpty()) {
-            return ResponseEntity.status(404).body(new ErrorResponse("Comanda não encontrada"));
+    @PostMapping("/{id}/fechar")
+    public ResponseEntity<?> fecharComanda(@PathVariable Long id) {
+        try {
+            comandaService.fecharComanda(id);  // ✅ aqui está a chamada correta
+            return ResponseEntity.ok(Map.of("message", "Comanda finalizada com sucesso!"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Erro ao finalizar comanda."));
         }
-
-        Comanda comanda = comandaOpt.get();
-        comanda.setStatus(Comanda.StatusComanda.FECHADA);
-        comanda.setDataFechamento(LocalDateTime.now());
-
-        Mesa mesa = comanda.getMesa();
-        if (mesa != null) {
-            mesa.setOcupada(false);
-            mesaRepository.save(mesa);
-        }
-
-        comandaRepository.save(comanda);
-
-        // Calcula o total da comanda
-        BigDecimal total = BigDecimal.ZERO;
-        List<ItemComanda> itens = comanda.getItens();
-        if (itens != null) {
-            total = itens.stream()
-                    .map(i -> BigDecimal.valueOf(i.getPrecoUnitario()).multiply(BigDecimal.valueOf(i.getQuantidade())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-
-        // Salva resumo
-        ComandaResumo resumo = new ComandaResumo();
-        resumo.setComanda(comanda);
-        resumo.setDataFechamento(LocalDateTime.now());
-        resumo.setTotal(total);
-        resumo.setNomeCliente("Consumidor");
-        resumo.setObservacoes("Fechamento automático via frontend");
-
-        resumoRepository.save(resumo);
-
-        return ResponseEntity.ok().body(toDTO(comanda));
-    }
-
-    @GetMapping("/{id}/resumo")
-    public ResponseEntity<?> buscarResumo(@PathVariable Long id) {
-        if (!comandaRepository.existsById(id)) {
-            return ResponseEntity.status(404).body(new ErrorResponse("Comanda não encontrada"));
-        }
-
-        List<ComandaResumo> resumos = resumoRepository.findByComandaId(id);
-        return ResponseEntity.ok(resumos);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluir(@PathVariable Long id) {
-        if (!comandaRepository.existsById(id)) {
-            return ResponseEntity.status(404).body(new ErrorResponse("Comanda não encontrada"));
-        }
-
-        comandaRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 }

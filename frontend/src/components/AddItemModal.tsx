@@ -29,17 +29,17 @@ export default function AddItemModal({ produtos, onAdicionar }: Props) {
   return (
     <Dialog open={open} onOpenChange={(value) => { setOpen(value); if (!value) resetarFormulario(); }}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 text-white">Adicionar Item</Button>
+        <Button className="bg-blue-600 text-white hover:bg-blue-700">Adicionar Item</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-white rounded-xl shadow-lg p-6 space-y-4">
         <DialogHeader>
-          <DialogTitle>Adicionar Item à Comanda</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">Adicionar Item à Comanda</DialogTitle>
         </DialogHeader>
 
         <select
           value={produtoId}
           onChange={e => setProdutoId(Number(e.target.value))}
-          className="border p-2 rounded w-full mb-2"
+          className="w-full border border-gray-300 rounded px-3 py-2"
         >
           <option disabled value={0}>Selecione um produto</option>
           {produtos.map(p => (
@@ -49,13 +49,17 @@ export default function AddItemModal({ produtos, onAdicionar }: Props) {
 
         <input
           type="number"
-          min={1}
           value={quantidade}
+          min={1}
           onChange={e => setQuantidade(Number(e.target.value))}
-          className="border p-2 rounded w-full mb-4"
+          className="w-full border border-gray-300 rounded px-3 py-2"
         />
 
-        <Button onClick={handleAdd} disabled={produtoId === 0}>
+        <Button
+          onClick={handleAdd}
+          disabled={produtoId === 0}
+          className="w-full bg-green-600 text-white hover:bg-green-700"
+        >
           Adicionar
         </Button>
       </DialogContent>

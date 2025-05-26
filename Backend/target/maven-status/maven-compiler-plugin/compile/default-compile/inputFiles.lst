@@ -18,6 +18,7 @@ C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\c
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\ComandaRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\MesaController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\services\ComandaService.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\services\ProdutoService.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\ProdutoController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Mesa.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Usuario.java
@@ -36,6 +37,7 @@ C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\d
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\CFOPRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Comanda.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\CFOPController.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\ComandaResumoController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\repository\UsuarioRepository.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\CSTController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\model\Produto.java

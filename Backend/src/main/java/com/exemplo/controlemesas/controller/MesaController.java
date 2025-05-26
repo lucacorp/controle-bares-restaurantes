@@ -1,16 +1,14 @@
 package com.exemplo.controlemesas.controller;
 
 import com.exemplo.controlemesas.model.Mesa;
-import com.exemplo.controlemesas.repository.MesaRepository;
 import com.exemplo.controlemesas.repository.ComandaRepository;
-import com.exemplo.controlemesas.dto.ErrorResponse;
-
+import com.exemplo.controlemesas.repository.MesaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/mesas")
@@ -24,43 +22,40 @@ public class MesaController {
     private ComandaRepository comandaRepository;
 
     @GetMapping
-    public List<Mesa> listarMesas() {
+    public List<Mesa> listarTodas() {
         return mesaRepository.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> buscarPorId(@PathVariable Long id) {
-        return mesaRepository.findById(id)
-                .<ResponseEntity<Object>>map(m -> ResponseEntity.ok().body(m))
-                .orElseGet(() -> ResponseEntity.status(404).body(new ErrorResponse("Mesa não encontrada")));
+    public ResponseEntity<Mesa> buscarPorId(@PathVariable Long id) {
+        Optional<Mesa> mesaOpt = mesaRepository.findById(id);
+        return mesaOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Mesa> criarMesa(@RequestBody Mesa mesa) {
-        Mesa novaMesa = mesaRepository.save(mesa);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novaMesa);
+    public ResponseEntity<Mesa> criar(@RequestBody Mesa mesa) {
+        Mesa salva = mesaRepository.save(mesa);
+        return ResponseEntity.ok(salva);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Object> atualizarMesa(@PathVariable Long id, @RequestBody Mesa mesaAtualizada) {
-        return mesaRepository.findById(id)
-                .<ResponseEntity<Object>>map(m -> {
-                    m.setDescricao(mesaAtualizada.getDescricao());
-                    m.setOcupada(mesaAtualizada.isOcupada());
-                    Mesa mesaSalva = mesaRepository.save(m);
-                    return ResponseEntity.ok().body(mesaSalva);
-                })
-                .orElseGet(() -> ResponseEntity.status(404).body(new ErrorResponse("Mesa não encontrada")));
+    public ResponseEntity<Mesa> atualizar(@PathVariable Long id, @RequestBody Mesa mesaAtualizada) {
+        return mesaRepository.findById(id).map(mesa -> {
+            mesa.setDescricao(mesaAtualizada.getDescricao());
+            mesa.setOcupada(mesaAtualizada.isOcupada());
+            mesaRepository.save(mesa);
+            return ResponseEntity.ok(mesa);
+        }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletarMesa(@PathVariable Long id) {
+    public ResponseEntity<?> excluir(@PathVariable Long id) {
         if (!mesaRepository.existsById(id)) {
-            return ResponseEntity.status(404).body(new ErrorResponse("Mesa não encontrada"));
+            return ResponseEntity.notFound().build();
         }
 
         if (comandaRepository.existsByMesaId(id)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("Não é possível excluir: há comandas associadas a esta mesa."));
+            return ResponseEntity.status(409).body("Não é possível excluir. Existem comandas associadas a esta mesa.");
         }
 
         mesaRepository.deleteById(id);

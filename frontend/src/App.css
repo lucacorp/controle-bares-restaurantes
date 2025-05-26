@@ -11,6 +11,81 @@
   text-align: center;
 }
 
+/* Botões principais */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* Tabela com zebra */
+table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Input número alinhado */
+input[type="number"] {
+  text-align: center;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.alert-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+
+/* Status */
+.status-aberta {
+  color: #16a34a; /* verde */
+  font-weight: bold;
+}
+
+.status-fechada {
+  color: #dc2626; /* vermelho */
+  font-weight: bold;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.alert-error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+.alert-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+
+
+
 .logo {
   height: 6em;
   padding: 1.5em;

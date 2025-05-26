@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pencil, Trash2, Plus, UtensilsCrossed } from 'lucide-react';
+import { Pencil, Trash2, Plus, UtensilsCrossed, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -30,6 +30,7 @@ export default function TableList() {
         alert('Mesa removida com sucesso!');
       } catch (err: any) {
         console.error('Erro ao remover mesa:', err);
+
         if (err.response?.status === 409) {
           alert('Não é possível remover a mesa, pois há comandas associadas.');
         } else {
@@ -37,10 +38,6 @@ export default function TableList() {
         }
       }
     }
-  };
-
-  const handleAbrirComanda = (mesaId: number) => {
-    navigate(`/comandas/${mesaId}/itens`);
   };
 
   return (
@@ -66,7 +63,7 @@ export default function TableList() {
                 Status: {table.ocupada ? 'Ocupada' : 'Disponível'}
               </p>
 
-              <div className="mt-4 grid grid-cols-3 gap-2 w-full">
+              <div className="mt-4 grid grid-cols-2 gap-2 w-full">
                 <button
                   onClick={() => navigate(`/mesas/${table.id}`)}
                   className="flex items-center justify-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -82,11 +79,10 @@ export default function TableList() {
                 </button>
 
                 <button
-                  onClick={() => handleAbrirComanda(table.id)}
-                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                  onClick={() => navigate(`/mesas/${table.id}/comandas`)}
+                  className="flex items-center justify-center gap-1 px-3 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition col-span-2"
                 >
-                  <UtensilsCrossed size={16} />
-                  {table.ocupada ? 'Ver Comanda' : 'Abrir Comanda'}
+                  <List size={16} /> Ver Comandas
                 </button>
               </div>
             </div>

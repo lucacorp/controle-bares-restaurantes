@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 
-import { useAuth } from "./AuthContext";
-
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import ProductList from "./components/ProductList";
@@ -12,8 +10,11 @@ import ReceitaList from "./components/ReceitaList";
 import ReceitaForm from "./components/ReceitaForm";
 import RotaProtegida from "./components/RotaProtegida";
 import ItensComandaPage from "./components/ItensComandaPage";
+import ComandaResumoPage from "./components/ComandaResumoPage";
 import SidebarLayout from "./components/SidebarLayout";
+import MesaComandasPage from "./components/MesaComandasPage";
 
+// Wrapper para extrair o comandaId da URL
 function ItensComandaWrapper() {
   const { id } = useParams();
   if (!id) return <div>Comanda inválida</div>;
@@ -21,20 +22,15 @@ function ItensComandaWrapper() {
 }
 
 function App() {
-  const { isAuthenticated } = useAuth();
-
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
-      />
+      {/* Redirecionamento inicial */}
+      <Route path="/" element={<Navigate to="/dashboard" />} />
 
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
-      />
+      {/* Login */}
+      <Route path="/login" element={<Login />} />
 
+      {/* Layout com sidebar para rotas protegidas */}
       <Route
         element={
           <RotaProtegida>
@@ -47,15 +43,22 @@ function App() {
         <Route path="/produtos/novo" element={<ProductForm />} />
         <Route path="/mesas" element={<TableList />} />
         <Route path="/mesas/nova" element={<FormMesa />} />
+        <Route path="/mesas/:id" element={<FormMesa />} />
+
+        {/*  Nova rota para múltiplas comandas por mesa */}
+        <Route path="/mesas/:mesaId/comandas" element={<MesaComandasPage />} />
+
         <Route path="/receitas" element={<ReceitaList />} />
         <Route path="/receitas/nova" element={<ReceitaForm />} />
+		<Route path="/comandas/resumos" element={<ComandaResumoPage />} />
+		<Route path="/comandas/resumos" element={<ComandaResumoPage />} /> 
+
+        {/* Itens da comanda */}
         <Route path="/comandas/:id/itens" element={<ItensComandaWrapper />} />
       </Route>
 
-      <Route
-        path="*"
-        element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
-      />
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/dashboard" />} />
     </Routes>
   );
 }
