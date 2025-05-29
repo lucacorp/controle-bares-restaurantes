@@ -6,13 +6,15 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comanda_resumo")
-public class ComandaResumo {
+public class ComandaResumo {  // ✅ Classe começa aqui
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "comanda_id") // ✅ Recomendado: explicitar o nome da coluna
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Comanda comanda;
 
     private LocalDateTime dataFechamento;
@@ -23,53 +25,24 @@ public class ComandaResumo {
 
     private String observacoes;
 
-    // Getters e setters
+    // ✅ Getters e Setters aqui dentro!
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Comanda getComanda() { return comanda; }
+    public void setComanda(Comanda comanda) { this.comanda = comanda; }
 
-    public Comanda getComanda() {
-        return comanda;
-    }
+    public LocalDateTime getDataFechamento() { return dataFechamento; }
+    public void setDataFechamento(LocalDateTime dataFechamento) { this.dataFechamento = dataFechamento; }
 
-    public void setComanda(Comanda comanda) {
-        this.comanda = comanda;
-    }
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
 
-    public LocalDateTime getDataFechamento() {
-        return dataFechamento;
-    }
+    public String getNomeCliente() { return nomeCliente; }
+    public void setNomeCliente(String nomeCliente) { this.nomeCliente = nomeCliente; }
 
-    public void setDataFechamento(LocalDateTime dataFechamento) {
-        this.dataFechamento = dataFechamento;
-    }
-
-    public BigDecimal getTotal() {
-        return total;
-    }
-
-    public void setTotal(BigDecimal total) {
-        this.total = total;
-    }
-
-    public String getNomeCliente() {
-        return nomeCliente;
-    }
-
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-}
+    public String getObservacoes() { return observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+    
+}  // ✅ Classe fecha aqui!

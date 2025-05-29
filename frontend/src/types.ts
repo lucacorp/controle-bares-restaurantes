@@ -34,3 +34,12 @@ export interface ComandaDTO {
   dataAbertura?: string;
   dataFechamento?: string | null;
 }
+
+interface ComandaResumo {
+  id: number;
+  comandaId: number;
+  total: number;
+  dataFechamento: string;
+  nomeCliente: string;
+  observacoes: string;
+}

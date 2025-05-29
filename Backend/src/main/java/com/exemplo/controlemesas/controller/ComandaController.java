@@ -31,7 +31,7 @@ public class ComandaController {
     private MesaRepository mesaRepository;
 
     @Autowired
-    private ComandaService comandaService;  // ✅ FALTAVA ISSO!
+    private ComandaService comandaService;
 
     private ComandaDTO toDTO(Comanda comanda) {
         ComandaDTO dto = new ComandaDTO();
@@ -84,9 +84,12 @@ public class ComandaController {
     }
 
     @PostMapping("/{id}/fechar")
-    public ResponseEntity<?> fecharComanda(@PathVariable Long id) {
+    public ResponseEntity<?> fecharComanda(
+            @PathVariable Long id,
+            @RequestParam(required = false) String nomeCliente,
+            @RequestParam(required = false) String observacoes) {
         try {
-            comandaService.fecharComanda(id);  // ✅ aqui está a chamada correta
+            comandaService.fecharComanda(id, nomeCliente, observacoes);
             return ResponseEntity.ok(Map.of("message", "Comanda finalizada com sucesso!"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));

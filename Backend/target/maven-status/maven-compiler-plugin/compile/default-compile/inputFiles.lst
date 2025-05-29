@@ -25,6 +25,7 @@ C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\m
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\ItemComandaController.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\services\AuthService.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\ComandaController.java
+C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\dto\ComandaResumoDTO.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\ControleMesasApplication.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\dto\LoginRequest.java
 C:\controle-bares-restaurantes\Backend\src\main\java\com\exemplo\controlemesas\controller\UsuarioController.java
