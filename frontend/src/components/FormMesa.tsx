@@ -3,8 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../services/api';
 import FormContainer from './FormContainer';
 
+type StatusMesa = 'LIVRE' | 'OCUPADA' | 'FECHADA';
+
+interface Mesa {
+  descricao: string;
+  ocupada: boolean;
+  status: StatusMesa;
+}
+
 export default function FormMesa() {
-  const [mesa, setMesa] = useState({ descricao: '', ocupada: false });
+  const [mesa, setMesa] = useState<Mesa>({
+    descricao: '',
+    ocupada: false,
+    status: 'LIVRE'
+  });
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -44,15 +56,13 @@ export default function FormMesa() {
 
       const mesaSalva = response.data;
       if (mesaSalva && mesaSalva.id) {
-        navigate(`/comandas/${mesaSalva.id}/itens`);
+        navigate(`/mesas`);
       } else {
         navigate('/mesas');
       }
     } catch (error: any) {
       console.error('Erro ao salvar mesa:', error);
-      const msg =
-        error?.response?.data?.message ||
-        'Erro ao salvar a mesa.';
+      const msg = error?.response?.data?.message || 'Erro ao salvar a mesa.';
       alert(msg);
     }
   };
@@ -82,6 +92,20 @@ export default function FormMesa() {
           >
             <option value="false">Não</option>
             <option value="true">Sim</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block font-medium mb-1">Status</label>
+          <select
+            name="status"
+            value={mesa.status}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+          >
+            <option value="LIVRE">LIVRE</option>
+            <option value="OCUPADA">OCUPADA</option>
+            <option value="FECHADA">FECHADA</option>
           </select>
         </div>
 

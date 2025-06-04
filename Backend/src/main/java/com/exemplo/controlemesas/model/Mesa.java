@@ -1,4 +1,5 @@
 package com.exemplo.controlemesas.model;
+import jakarta.validation.constraints.NotNull;
 
 import jakarta.persistence.*;
 
@@ -6,16 +7,27 @@ import jakarta.persistence.*;
 @Table(name = "mesas")
 public class Mesa {
 
+	
+    public enum StatusMesa {
+        LIVRE,
+        OCUPADA,
+        FECHADA
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer numero;
 
     private String descricao;
 
     private boolean ocupada;
+   
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private StatusMesa status;
 
     // Getters e Setters
+
     public Long getId() {
         return id;
     }
@@ -38,5 +50,13 @@ public class Mesa {
 
     public void setOcupada(boolean ocupada) {
         this.ocupada = ocupada;
+    }
+
+    public StatusMesa getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusMesa status) {
+        this.status = status;
     }
 }

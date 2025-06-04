@@ -47,6 +47,7 @@ com\exemplo\controlemesas\model\Produto.class
 com\exemplo\controlemesas\repository\ComandaResumoRepository.class
 com\exemplo\controlemesas\repository\MesaRepository.class
 com\exemplo\controlemesas\dto\ItemComandaDTO.class
+com\exemplo\controlemesas\model\Mesa$StatusMesa.class
 com\exemplo\controlemesas\dto\ErrorResponse.class
 com\exemplo\controlemesas\dto\ReceitaDTO.class
 com\exemplo\controlemesas\dto\ReceitaItemDTO.class

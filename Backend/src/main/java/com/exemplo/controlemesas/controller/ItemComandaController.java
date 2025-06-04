@@ -66,7 +66,6 @@ public class ItemComandaController {
         return ResponseEntity.badRequest().body(Map.of("message", ex.getMessage()));
     }
 
-    // ✅ Conversão de Entity -> DTO
     private ItemComandaDTO toDTO(ItemComanda item) {
         ItemComandaDTO dto = new ItemComandaDTO();
         dto.setId(item.getId());
@@ -78,10 +77,13 @@ public class ItemComandaController {
         return dto;
     }
 
-    // ✅ Conversão de DTO -> Entity
     private ItemComanda fromDTO(ItemComandaDTO dto) {
         Comanda comanda = comandaService.buscarPorId(dto.getComandaId())
                 .orElseThrow(() -> new IllegalArgumentException("Comanda não encontrada"));
+
+        if (!comanda.isAtivo() || comanda.getStatus() == Comanda.StatusComanda.FECHADA) {
+            throw new IllegalArgumentException("Não é possível lançar itens em uma comanda fechada ou inativa.");
+        }
 
         Produto produto = produtoService.buscarPorId(dto.getProdutoId())
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));

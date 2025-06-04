@@ -24,6 +24,7 @@ export interface ItemComanda {
   produto: { id: number; nome?: string };
   quantidade: number;
   precoUnitario: number;
+  ativo: boolean;
 }
 
 // types/ComandaDTO.ts

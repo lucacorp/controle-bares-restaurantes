@@ -16,6 +16,9 @@ public class Comanda {
     @ManyToOne
     @JoinColumn(name = "mesa_id")
     private Mesa mesa;
+    
+    @Column(name = "ativo")
+    private boolean ativo = true;
 
     private LocalDateTime dataAbertura;
     private LocalDateTime dataFechamento;
@@ -63,6 +66,15 @@ public class Comanda {
     public void setStatus(StatusComanda status) {
         this.status = status;
     }
+    
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+    
     @OneToMany(mappedBy = "comanda", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemComanda> itens;
 

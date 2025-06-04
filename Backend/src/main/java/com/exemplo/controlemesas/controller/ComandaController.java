@@ -3,20 +3,18 @@ package com.exemplo.controlemesas.controller;
 import com.exemplo.controlemesas.dto.ComandaDTO;
 import com.exemplo.controlemesas.dto.ErrorResponse;
 import com.exemplo.controlemesas.model.Comanda;
-import com.exemplo.controlemesas.model.Mesa;
 import com.exemplo.controlemesas.repository.ComandaRepository;
-import com.exemplo.controlemesas.repository.MesaRepository;
 import com.exemplo.controlemesas.services.ComandaService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,9 +24,6 @@ public class ComandaController {
 
     @Autowired
     private ComandaRepository comandaRepository;
-
-    @Autowired
-    private MesaRepository mesaRepository;
 
     @Autowired
     private ComandaService comandaService;
@@ -59,28 +54,28 @@ public class ComandaController {
 
     @GetMapping("/mesa/{mesaId}")
     public ResponseEntity<List<ComandaDTO>> listarPorMesa(@PathVariable Long mesaId) {
-        List<Comanda> comandas = comandaRepository.findByMesaId(mesaId);
+        List<Comanda> comandas = comandaRepository.findByMesaIdAndAtivoTrue(mesaId);
         List<ComandaDTO> dtos = comandas.stream().map(this::toDTO).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
     @PostMapping
     public ResponseEntity<?> criar(@Valid @RequestBody ComandaDTO dto) {
-        Optional<Mesa> mesaOpt = mesaRepository.findById(dto.getMesaId());
-        if (mesaOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Mesa não encontrada."));
+        try {
+            Comanda comanda = comandaService.criarComanda(dto.getMesaId());
+            return ResponseEntity.created(URI.create("/api/comandas/" + comanda.getId())).body(toDTO(comanda));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
+    }
 
-        Mesa mesa = mesaOpt.get();
-
-        Comanda comanda = new Comanda();
-        comanda.setMesa(mesa);
-        comanda.setDataAbertura(LocalDateTime.now());
-        comanda.setStatus(Comanda.StatusComanda.ABERTA);
-
-        Comanda salva = comandaRepository.save(comanda);
-
-        return ResponseEntity.created(URI.create("/api/comandas/" + salva.getId())).body(toDTO(salva));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> excluir(@PathVariable Long id) {
+        return comandaRepository.findById(id).map(comanda -> {
+            comanda.setAtivo(false);
+            comandaRepository.save(comanda);
+            return ResponseEntity.noContent().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{id}/fechar")
