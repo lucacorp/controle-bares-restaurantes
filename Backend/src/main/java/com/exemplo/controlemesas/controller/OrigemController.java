@@ -12,12 +12,12 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173") // 🔁 Para permitir acesso do frontend
 public class OrigemController {
 
-    @Autowired
-    private OrigemRepository origemRepository;
+	@Autowired
+	private OrigemRepository origemRepository;
 
-    // Lista todas as origens
-    @GetMapping
-    public List<Origem> listarTodos() {
-        return origemRepository.findAll();
-    }
+	// Lista todas as origens
+	@GetMapping
+	public List<Origem> listarTodos() {
+		return origemRepository.findAll();
+	}
 }

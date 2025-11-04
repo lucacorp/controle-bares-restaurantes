@@ -17,24 +17,23 @@ import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:5173")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<Usuario> login(@Valid @RequestBody LoginRequest loginRequest) {
-        Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmailAndSenha(loginRequest.getEmail(), loginRequest.getSenha());
-        return usuarioEncontrado
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(401).build()); // 401 Unauthorized
-    }
+	@PostMapping("/login")
+	public ResponseEntity<Usuario> login(@Valid @RequestBody LoginRequest loginRequest) {
+		Optional<Usuario> usuarioEncontrado = usuarioRepository.findByEmailAndSenha(loginRequest.getEmail(),
+				loginRequest.getSenha());
+		return usuarioEncontrado.map(ResponseEntity::ok).orElse(ResponseEntity.status(401).build()); // 401 Unauthorized
+	}
 
-    @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@Valid @RequestBody RegistroRequest registroRequest) {
-        Usuario novoUsuario = new Usuario();
-        novoUsuario.setNome(registroRequest.getNome());
-        novoUsuario.setEmail(registroRequest.getEmail());
-        novoUsuario.setSenha(registroRequest.getSenha()); // adicionar hash futuramente
-        Usuario salvo = usuarioRepository.save(novoUsuario);
-        return ResponseEntity.status(201).body(salvo); // 201 Created
-    }
+	@PostMapping
+	public ResponseEntity<Usuario> cadastrar(@Valid @RequestBody RegistroRequest registroRequest) {
+		Usuario novoUsuario = new Usuario();
+		novoUsuario.setNome(registroRequest.getNome());
+		novoUsuario.setEmail(registroRequest.getEmail());
+		novoUsuario.setSenha(registroRequest.getSenha()); // adicionar hash futuramente
+		Usuario salvo = usuarioRepository.save(novoUsuario);
+		return ResponseEntity.status(201).body(salvo); // 201 Created
+	}
 }

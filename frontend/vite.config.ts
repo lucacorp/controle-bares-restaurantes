@@ -11,8 +11,16 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',
+    port: 5173,
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': {
+        target: 'http://192.168.15.8:8080',
+        changeOrigin: true,
+      },
+    },
+    hmr: {
+      host: '192.168.15.8',
     },
   },
 });

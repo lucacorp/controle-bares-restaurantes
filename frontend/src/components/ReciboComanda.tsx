@@ -1,14 +1,39 @@
-import { useEffect, useState, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import api from "../services/api";
-import { useReactToPrint } from 'react-to-print';
+import { useReactToPrint } from "react-to-print";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
-interface ComandaResumo {
+/* ---------- tipos ---------- */
+export interface ComandaResumoDTO {
   id: number;
-  comandaId: number;
   total: number;
   dataFechamento: string;
   nomeCliente: string;
   observacoes: string;
+  numeroCupom?: string;
+  chaveSat?: string;
+  valorIcms?: number;
+  valorPis?: number;
+  valorCofins?: number;
+  itens: {
+    itemNo: number;
+    descricao: string;
+    quantidade: number;
+    precoUnitario: number;
+    subtotal: number;
+  }[];
+}
+
+export interface ReciboComandaHandle {
+  refresh: (dto: ComandaResumoDTO) => void;
+  savePDF: () => Promise<void>;
 }
 
 interface Props {
@@ -16,70 +41,115 @@ interface Props {
   autoPrint?: boolean;
 }
 
-export default function ReciboComanda({ comandaId, autoPrint = false }: Props) {
-  const [resumos, setResumos] = useState<ComandaResumo[]>([]);
-  const [erro, setErro] = useState<string>("");
-  const printRef = useRef<HTMLDivElement>(null);
+/* ---------- componente ---------- */
+const ReciboComanda = forwardRef<ReciboComandaHandle, Props>(
+  ({ comandaId, autoPrint = false }, ref) => {
+    const [resumo, setResumo] = useState<ComandaResumoDTO | null>(null);
+    const [erro, setErro] = useState("");
+    const printRef = useRef<HTMLDivElement>(null);
 
-  const loadResumo = async () => {
-    try {
-      const resp = await api.get(`/comandas/${comandaId}/resumo`);
-      setResumos(Array.isArray(resp.data) ? resp.data : []);
-    } catch (err) {
-      console.error("Erro ao carregar resumo:", err);
-      setErro("Erro ao carregar resumo.");
-    }
-  };
+    /* --------‑‑ expose imperative API -------- */
+    useImperativeHandle(ref, () => ({
+      refresh: (dto) => setResumo(dto),
+      savePDF: async () => {
+        if (!printRef.current) return;
+        /* captura em alta resolução */
+        const canvas = await html2canvas(printRef.current, { scale: 2 });
+        const img = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+          orientation: "p",
+          unit: "pt",
+          format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(img, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save(`Cupom-${comandaId}.pdf`);
+      },
+    }));
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: `Recibo-Comanda-${comandaId}`,
-    onAfterPrint: () => console.log('✅ Impressão concluída!')
-  });
+    /* -------- carregar resumo -------- */
+    useEffect(() => {
+      (async () => {
+        try {
+          const { data } = await api.get<ComandaResumoDTO[]>(
+            `/comanda-resumo/comanda/${comandaId}`
+          );
+          setResumo(data[0] ?? null);
+        } catch {
+          setErro("Erro ao carregar resumo.");
+        }
+      })();
+    }, [comandaId]);
 
-  useEffect(() => {
-    loadResumo();
-  }, [comandaId]);
+    /* -------- impressão direta -------- */
+    const handlePrint = useReactToPrint({
+      content: () => printRef.current,
+    });
 
-  useEffect(() => {
-    if (autoPrint && resumos.length > 0) {
-      setTimeout(() => {
-        handlePrint?.();
-      }, 500);
-    }
-  }, [autoPrint, resumos]);
+    useEffect(() => {
+      if (autoPrint && resumo) handlePrint();
+    }, [autoPrint, resumo]);
 
-  if (erro) {
-    return <div className="text-red-500">{erro}</div>;
-  }
+    if (erro) return <p className="text-red-500">{erro}</p>;
+    if (!resumo) return <p className="text-gray-500 text-sm">Carregando…</p>;
 
-  if (resumos.length === 0) {
-    return <p className="text-gray-500">Nenhum resumo disponível para impressão.</p>;
-  }
+    /* --------‑‑‑ layout -------- */
+    return (
+      <div className="mt-6">
+        <div
+          ref={printRef}
+          className="font-mono text-xs w-64 mx-auto bg-white p-4 border"
+        >
+          <h3 className="text-center font-bold">RECIBO DE COMANDA</h3>
+          <p>Comanda #{comandaId}</p>
+          <p>Data: {new Date(resumo.dataFechamento).toLocaleString()}</p>
+          <p>Cliente: {resumo.nomeCliente || "-"}</p>
+          <hr className="my-1" />
+          {resumo.itens.map((it) => (
+            <div key={it.itemNo} className="flex justify-between">
+              <span>
+                {it.quantidade}× {it.descricao}
+              </span>
+              <span>R$ {it.subtotal.toFixed(2)}</span>
+            </div>
+          ))}
+          <hr className="my-1" />
 
-  return (
-    <div className="mt-6">
-      <div ref={printRef} className="font-mono text-xs bg-white p-4 border w-64 mx-auto">
-        <h2 className="text-center font-bold mb-2">RECIBO DE COMANDA</h2>
-        <p>Comanda: #{comandaId}</p>
-        <p>Data: {new Date(resumos[0].dataFechamento).toLocaleString()}</p>
-        <p>Cliente: {resumos[0].nomeCliente || "-"}</p>
-        <p>Observações: {resumos[0].observacoes || "-"}</p>
-        <hr className="my-2" />
-        <p className="font-bold">TOTAL: R$ {resumos[0].total.toFixed(2)}</p>
-        <p className="text-center mt-4">*** Obrigado! ***</p>
-      </div>
+          {/* impostos + dados SAT (só se já emitido) */}
+          {resumo.valorIcms !== undefined && (
+            <>
+              <p>ICMS: R$ {resumo.valorIcms.toFixed(2)}</p>
+              <p>PIS:  R$ {resumo.valorPis?.toFixed(2)}</p>
+              <p>COFINS: R$ {resumo.valorCofins?.toFixed(2)}</p>
+              <p>Cupom # {resumo.numeroCupom}</p>
+              <p className="break-all">Chave: {resumo.chaveSat}</p>
+              <hr className="my-1" />
+            </>
+          )}
 
-      {!autoPrint && (
-        <div className="text-center mt-4">
+          <p className="font-bold text-right">
+            TOTAL R$ {resumo.total.toFixed(2)}
+          </p>
+          <p className="text-center mt-1">*** Obrigado! ***</p>
+        </div>
+
+        {/* botões utilitários */}
+        <div className="flex justify-center gap-2 mt-3">
           <button
             onClick={handlePrint}
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+            className="bg-black text-white px-3 py-1 rounded"
           >
-            Imprimir Recibo
+            Imprimir
+          </button>
+          <button
+            onClick={() => ref && (ref as any).current?.savePDF()}
+            className="bg-gray-700 text-white px-3 py-1 rounded"
+          >
+            Salvar PDF
           </button>
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
+    );
+  }
+);
+
+export default ReciboComanda;

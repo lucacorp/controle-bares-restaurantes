@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ReceitaItemRepository extends JpaRepository<ReceitaItem, Long> {
-}
 
+	boolean existsByProdutoId(Long produtoId);
+}

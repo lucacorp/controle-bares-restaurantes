@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,121 +28,146 @@ import java.util.stream.Collectors;
 @Validated
 @RestController
 @RequestMapping("/api/receitas")
-@CrossOrigin(origins = "http://localhost:5173") // 🔁 CORS mais seguro e específico
+@CrossOrigin(origins = "http://localhost:5173")
 public class ReceitaController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
 
-    @Autowired
-    private ReceitaRepository receitaRepository;
+	@Autowired
+	private ReceitaRepository receitaRepository;
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+	@Autowired
+	private ProdutoRepository produtoRepository;
 
-    @Autowired
-    private ReceitaItemRepository receitaItemRepository;
+	@Autowired
+	private ReceitaItemRepository receitaItemRepository;
 
-    // Listar todas as receitas
-    @GetMapping
-    public List<Receita> listar() {
-        return receitaRepository.findAll();
-    }
+	@GetMapping
+	public ResponseEntity<List<ReceitaDTO>> listar() {
+		List<Receita> receitas = receitaRepository.findAll();
+		List<ReceitaDTO> receitasDTO = receitas.stream().map(this::toDTO).collect(Collectors.toList());
+		return ResponseEntity.ok(receitasDTO);
+	}
 
-    // Buscar uma receita por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<ReceitaDTO> buscarPorId(@PathVariable Long id) {
-        Optional<Receita> receitaOpt = receitaRepository.findById(id);
-        return receitaOpt.map(receita -> ResponseEntity.ok(toDTO(receita)))
-                         .orElse(ResponseEntity.notFound().build());
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<ReceitaDTO> buscarPorId(@PathVariable Long id) {
+		Optional<Receita> receitaOpt = receitaRepository.findById(id);
+		return receitaOpt.map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	}
 
-    // Criar uma nova receita
-    @PostMapping
-    public ResponseEntity<ReceitaDTO> salvar(@RequestBody @Valid ReceitaDTO dto) {
-        Receita receita = fromDTO(dto);
-        receita = receitaRepository.save(receita);
-        return ResponseEntity.status(201).body(toDTO(receita)); // 201 Created
-    }
+	@PostMapping
+	public ResponseEntity<ReceitaDTO> salvar(@RequestBody @Valid ReceitaDTO dto) {
+		Receita receita = fromDTO(dto);
+		receita = receitaRepository.save(receita);
+		return ResponseEntity.status(201).body(toDTO(receita));
+	}
 
-    // Atualizar uma receita existente
-    @PutMapping("/{id}")
-    public ResponseEntity<ReceitaDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ReceitaDTO dto) {
-        Optional<Receita> receitaOpt = receitaRepository.findById(id);
-        if (receitaOpt.isEmpty()) return ResponseEntity.notFound().build();
+	@PutMapping("/{id}")
+	public ResponseEntity<ReceitaDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ReceitaDTO dto) {
+		Optional<Receita> receitaOpt = receitaRepository.findById(id);
+		if (receitaOpt.isEmpty())
+			return ResponseEntity.notFound().build();
 
-        Receita receita = receitaOpt.get();
-        receita.setNome(dto.getNome());
-        receita.setAdicional(dto.getAdicional());
+		Receita receita = receitaOpt.get();
+		receita.setNome(dto.getNome());
+		// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são BigDecimal
+		receita.setAdicional(dto.getAdicional() != null ? BigDecimal.valueOf(dto.getAdicional()) : BigDecimal.ZERO);
 
-        Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
-        receita.setProdutoFinal(produtoFinal);
+		Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
+		receita.setProdutoFinal(produtoFinal);
 
-        receita.getItens().clear();
-        for (ReceitaItemDTO itemDTO : dto.getItens()) {
-            Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
+		receita.getItens().clear();
+		receitaRepository.save(receita);
 
-            ReceitaItem item = new ReceitaItem();
-            item.setProduto(produto);
-            item.setQuantidade(itemDTO.getQuantidade());
-            item.setReceita(receita);
-            receita.getItens().add(item);
-        }
+		List<ReceitaItem> novosItens = new ArrayList<>();
+		if (dto.getItens() != null) {
+			for (ReceitaItemDTO itemDTO : dto.getItens()) {
+				Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
+						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
 
-        receita = receitaRepository.save(receita);
-        return ResponseEntity.ok(toDTO(receita));
-    }
+				ReceitaItem item = new ReceitaItem();
+				item.setProduto(produto);
+				// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são BigDecimal
+				item.setQuantidade(itemDTO.getQuantidade() != null ? BigDecimal.valueOf(itemDTO.getQuantidade())
+						: BigDecimal.ZERO);
+				item.setReceita(receita);
+				novosItens.add(item);
+			}
+		}
+		receita.setItens(novosItens);
 
-    // Deletar uma receita
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!receitaRepository.existsById(id)) return ResponseEntity.notFound().build();
-        receitaRepository.deleteById(id);
-        return ResponseEntity.noContent().build(); // 204 No Content
-    }
+		receita = receitaRepository.save(receita);
+		return ResponseEntity.ok(toDTO(receita));
+	}
 
-    // Converte de entidade para DTO
-    private ReceitaDTO toDTO(Receita receita) {
-        ReceitaDTO dto = new ReceitaDTO();
-        dto.setId(receita.getId());
-        dto.setNome(receita.getNome());
-        dto.setAdicional(receita.getAdicional());
-        dto.setProdutoFinalId(receita.getProdutoFinal().getId());
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deletar(@PathVariable Long id) {
+		if (!receitaRepository.existsById(id))
+			return ResponseEntity.notFound().build();
+		receitaRepository.deleteById(id);
+		return ResponseEntity.noContent().build();
+	}
 
-        List<ReceitaItemDTO> itensDTO = receita.getItens().stream().map(item -> {
-            ReceitaItemDTO itemDTO = new ReceitaItemDTO();
-            itemDTO.setProdutoId(item.getProduto().getId());
-            itemDTO.setQuantidade(item.getQuantidade());
-            return itemDTO;
-        }).collect(Collectors.toList());
+	private ReceitaDTO toDTO(Receita receita) {
+		ReceitaDTO dto = new ReceitaDTO();
+		dto.setId(receita.getId());
+		dto.setNome(receita.getNome());
+		// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são Double
+		dto.setAdicional(receita.getAdicional() != null ? receita.getAdicional().doubleValue() : 0.0);
 
-        dto.setItens(itensDTO);
-        return dto;
-    }
+		if (receita.getProdutoFinal() != null) {
+			dto.setProdutoFinalId(receita.getProdutoFinal().getId());
+		} else {
+			dto.setProdutoFinalId(null);
+			logger.warn("Receita ID {} tem produtoFinal nulo.", receita.getId());
+		}
 
-    // Converte de DTO para entidade
-    private Receita fromDTO(ReceitaDTO dto) {
-        Receita receita = new Receita();
-        receita.setNome(dto.getNome());
-        receita.setAdicional(dto.getAdicional());
+		List<ReceitaItemDTO> itensDTO = (receita.getItens() != null) ? receita.getItens().stream().map(item -> {
+			ReceitaItemDTO itemDTO = new ReceitaItemDTO();
+			if (item.getProduto() != null) {
+				itemDTO.setProdutoId(item.getProduto().getId());
+			} else {
+				itemDTO.setProdutoId(null);
+				logger.warn("ReceitaItem ID {} tem produto nulo na Receita ID {}.", item.getId(), receita.getId());
+			}
+			// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são Double
+			itemDTO.setQuantidade(item.getQuantidade() != null ? item.getQuantidade().doubleValue() : 0.0);
+			return itemDTO;
+		}).collect(Collectors.toList()) : new ArrayList<>();
 
-        Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
-        receita.setProdutoFinal(produtoFinal);
+		dto.setItens(itensDTO);
+		return dto;
+	}
 
-        List<ReceitaItem> itens = new ArrayList<>();
-        for (ReceitaItemDTO itemDTO : dto.getItens()) {
-            Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
-            ReceitaItem item = new ReceitaItem();
-            item.setProduto(produto);
-            item.setQuantidade(itemDTO.getQuantidade());
-            item.setReceita(receita);
-            itens.add(item);
-        }
+	private Receita fromDTO(ReceitaDTO dto) {
+		Receita receita = new Receita();
+		if (dto.getId() != null) {
+			receita.setId(dto.getId());
+		}
+		receita.setNome(dto.getNome());
+		// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são BigDecimal
+		receita.setAdicional(dto.getAdicional() != null ? BigDecimal.valueOf(dto.getAdicional()) : BigDecimal.ZERO);
 
-        receita.setItens(itens);
-        return receita;
-    }
+		Produto produtoFinal = produtoRepository.findById(dto.getProdutoFinalId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto final não encontrado"));
+		receita.setProdutoFinal(produtoFinal);
+
+		List<ReceitaItem> itens = new ArrayList<>();
+		if (dto.getItens() != null) {
+			for (ReceitaItemDTO itemDTO : dto.getItens()) {
+				Produto produto = produtoRepository.findById(itemDTO.getProdutoId())
+						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado"));
+				ReceitaItem item = new ReceitaItem();
+				item.setProduto(produto);
+				// CORREÇÃO FINAL AQUI: Garante que ambos os lados do ternário são BigDecimal
+				item.setQuantidade(itemDTO.getQuantidade() != null ? BigDecimal.valueOf(itemDTO.getQuantidade())
+						: BigDecimal.ZERO);
+				item.setReceita(receita);
+				itens.add(item);
+			}
+		}
+		receita.setItens(itens);
+		return receita;
+	}
 }

@@ -1,177 +1,96 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+// src/components/ProductList.tsx
+
+import { useEffect, useState } from 'react';
 import api from '../services/api';
-import FormContainer from './FormContainer';
+import { toast } from 'react-toastify';
 
-export default function ProductForm() {
-  const [produto, setProduto] = useState({
-    codigo: '',
-    codigo_barras: '',
-    nome: '',
-    descricao: '',
-    grupo: '',
-    tipo: '',
-    categoria: '',
-    unidade: '',
-    preco: '',
-    preco_custo: '',
-    ncm: '',
-    cfop: '',
-    cst: '',
-    origem: '',
-    aliquota_icms: '',
-    aliquota_ipi: '',
-  });
-
-  const [cfopList, setCfopList] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [cstList, setCstList] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [origemList, setOrigemList] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [icmsList] = useState<string[]>(['0', '7', '12', '17', '18', '25']);
-
-  const navigate = useNavigate();
-  const { id } = useParams();
+export default function ProductList({
+  onEdit,
+  refreshTrigger
+}: {
+  onEdit: (id: number) => void;
+  refreshTrigger: number;
+}) {
+  const [produtos, setProdutos] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProdutos = async () => {
       try {
-        if (id) {
-          const response = await api.get(`/produtos/${id}`);
-          setProduto(response.data);
-        }
-
-        const [cfopData, cstData, origemData] = await Promise.all([
-          api.get('/cfop'),
-          api.get('/cst'),
-          api.get('/origem'),
-        ]);
-
-        setCfopList(cfopData.data);
-        setCstList(cstData.data);
-        setOrigemList(origemData.data);
+        const response = await api.get('/produtos');
+        setProdutos(response.data);
       } catch (error) {
-        console.error('Erro ao buscar dados:', error);
-        alert('Erro ao carregar informações.');
+        console.error('Erro ao carregar produtos:', error);
+        toast.error('Erro ao carregar produtos');
       }
     };
 
-    fetchData();
-  }, [id]);
+    fetchProdutos();
+  }, [refreshTrigger]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    if (name === 'codigo_barras') {
-      const numeric = value.replace(/\D/g, '');
-      if (numeric.length > 13) return;
-      setProduto((prev) => ({ ...prev, [name]: numeric }));
-      return;
-    }
-
-    if (name === 'preco' || name === 'preco_custo') {
-      const numeric = value.replace(/[^\d]/g, '');
-      const formatted = (Number(numeric) / 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      setProduto((prev) => ({ ...prev, [name]: formatted }));
-      return;
-    }
-
-    if (name === 'ncm') {
-      const numeric = value.replace(/\D/g, '');
-      if (numeric.length > 8) return;
-      setProduto((prev) => ({ ...prev, [name]: numeric }));
-      return;
-    }
-
-    if (name === 'aliquota_icms' || name === 'aliquota_ipi') {
-      const sanitized = value.replace(/[^\d.]/g, '');
-      const number = parseFloat(sanitized);
-      if (!isNaN(number) && number <= 100) {
-        setProduto((prev) => ({ ...prev, [name]: sanitized }));
-      } else if (value === '') {
-        setProduto((prev) => ({ ...prev, [name]: '' }));
+  const handleDelete = async (id: number) => {
+    if (confirm('Tem certeza que deseja excluir este produto?')) {
+      try {
+        await api.delete(`/produtos/${id}`);
+        toast.success('Produto excluído com sucesso!');
+        // atualiza lista após excluir:
+        setProdutos((prev) => prev.filter((p) => p.id !== id));
+      } catch (error) {
+        console.error('Erro ao excluir produto:', error);
+        toast.error('Erro ao excluir produto');
       }
-      return;
-    }
-
-    setProduto((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const method = id ? 'put' : 'post';
-    const url = id ? `/produtos/${id}` : '/produtos';
-
-    try {
-      await api[method](url, produto);
-      alert(`Produto ${id ? 'atualizado' : 'cadastrado'} com sucesso!`);
-      navigate('/produtos/lista');
-    } catch (error) {
-      console.error('Erro ao salvar produto:', error);
-      alert('Erro ao salvar produto.');
     }
   };
 
   return (
-    <FormContainer title={id ? 'Editar Produto' : 'Cadastrar Produto'}>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input name="codigo" value={produto.codigo} readOnly placeholder="Código" className="p-2 border rounded bg-gray-100" />
-          <input name="codigo_barras" value={produto.codigo_barras} onChange={handleChange} placeholder="Código de Barras" className="p-2 border rounded" />
-          <input name="nome" value={produto.nome} onChange={handleChange} placeholder="Nome" className="p-2 border rounded" />
-          <input name="grupo" value={produto.grupo} onChange={handleChange} placeholder="Grupo" className="p-2 border rounded" />
-          <input name="categoria" value={produto.categoria} onChange={handleChange} placeholder="Categoria" className="p-2 border rounded" />
-          <input name="unidade" value={produto.unidade} onChange={handleChange} placeholder="Unidade" className="p-2 border rounded" />
-          <input name="preco" value={produto.preco} onChange={handleChange} placeholder="Preço Venda" className="p-2 border rounded" />
-          <input name="preco_custo" value={produto.preco_custo} onChange={handleChange} placeholder="Preço Custo" className="p-2 border rounded" />
-          <textarea name="descricao" value={produto.descricao} onChange={handleChange} placeholder="Descrição" className="p-2 border rounded col-span-1 md:col-span-2" />
-          <input name="ncm" value={produto.ncm} onChange={handleChange} placeholder="NCM" className="p-2 border rounded" />
-
-          <select name="cfop" value={produto.cfop} onChange={handleChange} className="p-2 border rounded">
-            <option value="">CFOP</option>
-            {cfopList.map((cfop) => (
-              <option key={cfop.codigo} value={cfop.codigo}>
-                {cfop.codigo} - {cfop.descricao}
-              </option>
+    <div>
+      <h2 className="text-lg font-bold mb-4">Lista de Produtos</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm text-left border border-gray-300">
+          <thead className="bg-gray-100 text-gray-700">
+            <tr>
+              <th className="p-2 border">Código</th>
+              <th className="p-2 border">Nome</th>
+              <th className="p-2 border">Grupo</th>
+              <th className="p-2 border">Unidade</th>
+              <th className="p-2 border">Estoque</th>
+              <th className="p-2 border text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {produtos.map((produto) => (
+              <tr
+                key={produto.id}
+                className="hover:bg-gray-100 cursor-pointer"
+                onDoubleClick={() => onEdit(produto.id)}
+              >
+                <td className="p-2 border">{produto.codigo}</td>
+                <td className="p-2 border">{produto.nome}</td>
+                <td className="p-2 border">{produto.grupo}</td>
+                <td className="p-2 border">{produto.unidade}</td>
+                <td className="p-2 border text-center">{produto.estoqueAtual ?? 0}</td>
+                <td className="p-2 border text-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // evita disparar onDoubleClick
+                      handleDelete(produto.id);
+                    }}
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-sm"
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
             ))}
-          </select>
-
-          <select name="cst" value={produto.cst} onChange={handleChange} className="p-2 border rounded">
-            <option value="">CST</option>
-            {cstList.map((cst) => (
-              <option key={cst.codigo} value={cst.codigo}>
-                {cst.codigo} - {cst.descricao}
-              </option>
-            ))}
-          </select>
-
-          <select name="origem" value={produto.origem} onChange={handleChange} className="p-2 border rounded">
-            <option value="">Origem</option>
-            {origemList.map((origem) => (
-              <option key={origem.codigo} value={origem.codigo}>
-                {origem.codigo} - {origem.descricao}
-              </option>
-            ))}
-          </select>
-
-          <select name="aliquota_icms" value={produto.aliquota_icms} onChange={handleChange} className="p-2 border rounded">
-            <option value="">ICMS</option>
-            {icmsList.map((icms) => (
-              <option key={icms} value={icms}>
-                {icms}
-              </option>
-            ))}
-          </select>
-
-          <input name="aliquota_ipi" value={produto.aliquota_ipi} onChange={handleChange} placeholder="IPI" className="p-2 border rounded" />
-        </div>
-
-        <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700">
-          {id ? 'Atualizar' : 'Cadastrar'}
-        </button>
-      </form>
-    </FormContainer>
+            {produtos.length === 0 && (
+              <tr>
+                <td colSpan={6} className="p-4 text-center text-gray-500">
+                  Nenhum produto encontrado.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

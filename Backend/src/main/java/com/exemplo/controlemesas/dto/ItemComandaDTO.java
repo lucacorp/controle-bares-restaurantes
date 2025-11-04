@@ -1,29 +1,64 @@
 package com.exemplo.controlemesas.dto;
 
-public class ItemComandaDTO {
-    private Long id;  // Também é útil retornar o ID do item para remoção
-    private Long comandaId;
-    private Long produtoId;
-    private String produtoDescricao;  // ✅ NOVO campo para facilitar exibição
-    private int quantidade;
-    private double precoUnitario;
+import com.exemplo.controlemesas.model.ItemComanda;
+import com.exemplo.controlemesas.model.enums.StatusItemComanda;
 
-    // Getters e Setters
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+public class ItemComandaDTO {
+
+    private Long id;
+    private Long produtoId;
+    private String produtoNome;
+    private int quantidade;
+    private BigDecimal precoVenda;
+    private BigDecimal total;
+    private StatusItemComanda status;
+    private String responsavel;
+    private LocalDateTime dataRegistro;
+
+    public ItemComandaDTO() {}
+
+    // 🔹 Construtor que faltava
+    public ItemComandaDTO(ItemComanda item) {
+        this.id = item.getId();
+        this.produtoId = item.getProduto().getId();
+        this.produtoNome = item.getProduto().getNome();
+        this.quantidade = item.getQuantidade();
+        this.precoVenda = item.getPrecoVenda();
+        this.total = item.getTotal();
+        this.status = item.getStatus();
+        this.responsavel = item.getResponsavel();
+        this.dataRegistro = item.getDataRegistro();
+    }
+
+    // ===== Getters e Setters =====
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-
-    public Long getComandaId() { return comandaId; }
-    public void setComandaId(Long comandaId) { this.comandaId = comandaId; }
 
     public Long getProdutoId() { return produtoId; }
     public void setProdutoId(Long produtoId) { this.produtoId = produtoId; }
 
-    public String getProdutoDescricao() { return produtoDescricao; }
-    public void setProdutoDescricao(String produtoDescricao) { this.produtoDescricao = produtoDescricao; }
+    public String getProdutoNome() { return produtoNome; }
+    public void setProdutoNome(String produtoNome) { this.produtoNome = produtoNome; }
 
     public int getQuantidade() { return quantidade; }
     public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
 
-    public double getPrecoUnitario() { return precoUnitario; }
-    public void setPrecoUnitario(double precoUnitario) { this.precoUnitario = precoUnitario; }
+    public BigDecimal getPrecoVenda() { return precoVenda; }
+    public void setPrecoVenda(BigDecimal precoVenda) { this.precoVenda = precoVenda; }
+
+    public BigDecimal getTotal() { return total; }
+    public void setTotal(BigDecimal total) { this.total = total; }
+
+    public StatusItemComanda getStatus() { return status; }
+    public void setStatus(StatusItemComanda status) { this.status = status; }
+
+    public String getResponsavel() { return responsavel; }
+    public void setResponsavel(String responsavel) { this.responsavel = responsavel; }
+
+    public LocalDateTime getDataRegistro() { return dataRegistro; }
+    public void setDataRegistro(LocalDateTime dataRegistro) { this.dataRegistro = dataRegistro; }
+
 }

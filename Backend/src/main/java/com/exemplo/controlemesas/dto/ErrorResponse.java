@@ -1,18 +1,29 @@
-// src/main/java/com/exemplo/controlemesas/dto/ErrorResponse.java
 package com.exemplo.controlemesas.dto;
 
+import java.util.Map;
+
 public class ErrorResponse {
-    private String mensagem;
 
-    public ErrorResponse(String mensagem) {
-        this.mensagem = mensagem;
-    }
+	private String message;
+	private Map<String, String> details;
 
-    public String getMensagem() {
-        return mensagem;
-    }
+	public ErrorResponse(String message) {
+		this.message = message;
+	}
 
-    public void setMensagem(String mensagem) {
-        this.mensagem = mensagem;
-    }
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Map<String, String> getDetails() {
+		return details;
+	}
+
+	public void setDetails(Map<String, String> details) {
+		this.details = details;
+	}
 }

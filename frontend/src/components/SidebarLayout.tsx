@@ -1,20 +1,38 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  PackageSearch,
+  Settings,
+} from "lucide-react";
 
 export default function SidebarLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
-  const menuItems = [
-    { icon: "🏠", label: "Dashboard", path: "/dashboard" },
-    { icon: "🍽️", label: "Mesas", path: "/mesas" },
-    { icon: "📦", label: "Produtos", path: "/produtos" },
-    { icon: "🍳", label: "Receitas", path: "/receitas" },
-    { icon: "📊", label: "Relatórios", path: "/relatorios" },
-    { icon: "🧾", label: "Resumos", path: "/comandas/resumos" },  // ✅ Novo item
-  ];
+  
+    const menuItems = [
+  { icon: "🏠", label: "Dashboard", path: "/dashboard" },
+  { icon: "📷", label: "Painel QR Code", path: "/painel/qrcodes" },
+  { icon: "🍽️", label: "Mesas", path: "/mesas" },
+  { icon: "📦", label: "Produtos", path: "/produtos" },
+  { icon: "🍳", label: "Receitas", path: "/receitas" },
+  {
+    icon: <PackageSearch size={18} />,
+    label: "Estoque",
+    path: "/estoque",
+  },
+  { icon: "📊", label: "Relatórios", path: "/relatorios" },
+  { icon: "🧾", label: "Resumos", path: "/comandas/resumos" },
+  {
+    icon: <Settings size={18} />,
+    label: "Configurações",
+    path: "/config",
+  },
+];
+
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 

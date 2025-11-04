@@ -13,12 +13,12 @@ import java.util.List;
 @RequestMapping("/api/cst")
 public class CSTController {
 
-    @Autowired
-    private CstRepository cstRepository;
+	@Autowired
+	private CstRepository cstRepository;
 
-    // Endpoint para listar todos os CSTs
-    @GetMapping
-    public List<CST> listarTodos() {
-        return cstRepository.findAll();
-    }
+	// Endpoint para listar todos os CSTs
+	@GetMapping
+	public List<CST> listarTodos() {
+		return cstRepository.findAll();
+	}
 }

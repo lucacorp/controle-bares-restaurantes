@@ -44,3 +44,10 @@ interface ComandaResumo {
   nomeCliente: string;
   observacoes: string;
 }
+
+await api.post("/movimentacoes-estoque", {
+  produtoId: 1,
+  quantidade: 2,
+  tipo: "ENTRADA", // ou "SAIDA"
+  observacao: "teste"
+});

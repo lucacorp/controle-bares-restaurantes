@@ -7,8 +7,8 @@ export default function Dashboard() {
   const { logout } = useAuth();
 
   const handleLogout = () => {
-    logout(); // Remove token do localStorage e atualiza o estado
-    navigate("/login"); // Redireciona para login
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -62,6 +62,15 @@ export default function Dashboard() {
         >
           <h3 className="text-xl font-semibold mb-2">📊 Relatórios</h3>
           <p className="text-gray-600">Visualize relatórios e métricas</p>
+        </button>
+
+        {/* Novo botão para Cozinha/Bar */}
+        <button
+          onClick={() => navigate('/cozinha')}
+          className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition text-left w-full"
+        >
+          <h3 className="text-xl font-semibold mb-2">👨‍🍳 Painel da Cozinha / Bar</h3>
+          <p className="text-gray-600">Controle de pedidos em preparo</p>
         </button>
       </div>
     </div>

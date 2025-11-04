@@ -22,62 +22,61 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    // Registro de novo usuário
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegistroRequest registroRequest) {
-        Map<String, String> response = new HashMap<>();
+	// Registro de novo usuário
+	@PostMapping("/register")
+	public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegistroRequest registroRequest) {
+		Map<String, String> response = new HashMap<>();
 
-        if (usuarioRepository.existsByEmail(registroRequest.getEmail())) {
-            response.put("mensagem", "E-mail já está em uso.");
-            return ResponseEntity.badRequest().body(response);
-        }
+		if (usuarioRepository.existsByEmail(registroRequest.getEmail())) {
+			response.put("mensagem", "E-mail já está em uso.");
+			return ResponseEntity.badRequest().body(response);
+		}
 
-        Usuario novoUsuario = new Usuario();
-        novoUsuario.setNome(registroRequest.getNome());
-        novoUsuario.setEmail(registroRequest.getEmail());
-        novoUsuario.setSenha(passwordEncoder.encode(registroRequest.getSenha()));
+		Usuario novoUsuario = new Usuario();
+		novoUsuario.setNome(registroRequest.getNome());
+		novoUsuario.setEmail(registroRequest.getEmail());
+		novoUsuario.setSenha(passwordEncoder.encode(registroRequest.getSenha()));
 
-        usuarioRepository.save(novoUsuario);
+		usuarioRepository.save(novoUsuario);
 
-        response.put("mensagem", "Usuário registrado com sucesso.");
-        return ResponseEntity.ok(response);
-    }
+		response.put("mensagem", "Usuário registrado com sucesso.");
+		return ResponseEntity.ok(response);
+	}
 
-    // Login + geração de token
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha())
-            );
+	// Login + geração de token
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+		try {
+			Authentication auth = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getSenha()));
 
-            if (auth.isAuthenticated()) {
-                String token = jwtUtil.generateToken(loginRequest.getEmail());
+			if (auth.isAuthenticated()) {
+				String token = jwtUtil.generateToken(loginRequest.getEmail());
 
-                Map<String, String> response = new HashMap<>();
-                response.put("token", token);
-                return ResponseEntity.ok(response);
-            }
-        } catch (AuthenticationException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("mensagem", "Login ou senha inválidos.");
-            return ResponseEntity.status(401).body(response);
-        }
+				Map<String, String> response = new HashMap<>();
+				response.put("token", token);
+				return ResponseEntity.ok(response);
+			}
+		} catch (AuthenticationException e) {
+			Map<String, String> response = new HashMap<>();
+			response.put("mensagem", "Login ou senha inválidos.");
+			return ResponseEntity.status(401).body(response);
+		}
 
-        Map<String, String> response = new HashMap<>();
-        response.put("mensagem", "Erro desconhecido.");
-        return ResponseEntity.status(500).body(response);
-    }
+		Map<String, String> response = new HashMap<>();
+		response.put("mensagem", "Erro desconhecido.");
+		return ResponseEntity.status(500).body(response);
+	}
 }

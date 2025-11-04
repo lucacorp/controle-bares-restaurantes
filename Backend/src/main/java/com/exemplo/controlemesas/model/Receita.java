@@ -1,66 +1,89 @@
 package com.exemplo.controlemesas.model;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal; // Importação necessária para BigDecimal
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "receita")
 public class Receita {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String nome;
+	// Adicionados campos 'nome' e 'adicional' conforme os erros
+	private String nome;
+	private BigDecimal adicional;
 
-    private BigDecimal adicional;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "produto_final_id", unique = true, nullable = false)
+	private Produto produtoFinal;
 
-    @ManyToOne
-    @JoinColumn(name = "produto_final_id")
-    private Produto produtoFinal;
+	@OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@JsonManagedReference
+	private List<ReceitaItem> itens;
 
-    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReceitaItem> itens = new ArrayList<>();
+	public Receita() {
+	}
 
-    // Getters e Setters
-    public Long getId() {
-        return id;
-    }
+	public Receita(Produto produtoFinal) {
+		this.produtoFinal = produtoFinal;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getNome() {
-        return nome;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	public String getNome() {
+		return nome;
+	}
 
-    public BigDecimal getAdicional() {
-        return adicional;
-    }
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
 
-    public void setAdicional(BigDecimal adicional) {
-        this.adicional = adicional;
-    }
+	public BigDecimal getAdicional() {
+		return adicional;
+	}
 
-    public Produto getProdutoFinal() {
-        return produtoFinal;
-    }
+	public void setAdicional(BigDecimal adicional) {
+		this.adicional = adicional;
+	}
 
-    public void setProdutoFinal(Produto produtoFinal) {
-        this.produtoFinal = produtoFinal;
-    }
+	public Produto getProdutoFinal() {
+		return produtoFinal;
+	}
 
-    public List<ReceitaItem> getItens() {
-        return itens;
-    }
+	public void setProdutoFinal(Produto produtoFinal) {
+		this.produtoFinal = produtoFinal;
+	}
 
-    public void setItens(List<ReceitaItem> itens) {
-        this.itens = itens;
-    }
+	public List<ReceitaItem> getItens() {
+		return itens;
+	}
+
+	public void setItens(List<ReceitaItem> itens) {
+		this.itens = itens;
+	}
+
+	public void addItem(ReceitaItem item) {
+		if (this.itens == null) {
+			this.itens = new java.util.ArrayList<>();
+		}
+		this.itens.add(item);
+		item.setReceita(this);
+	}
+
+	public void removeItem(ReceitaItem item) {
+		if (this.itens != null) {
+			this.itens.remove(item);
+			item.setReceita(null);
+		}
+	}
 }

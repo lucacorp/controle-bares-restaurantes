@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ComandaResumoRepository extends JpaRepository<ComandaResumo, Long> {
 
-    List<ComandaResumo> findByComandaId(Long comandaId);
+	List<ComandaResumo> findByComandaId(Long comandaId);
 }

@@ -5,4 +5,3 @@ import com.exemplo.controlemesas.model.CST;
 
 public interface CstRepository extends JpaRepository<CST, Long> {
 }
-

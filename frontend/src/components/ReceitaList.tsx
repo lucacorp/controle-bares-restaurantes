@@ -1,3 +1,4 @@
+// src/components/ReceitaList.tsx
 import { useEffect, useState } from "react";
 import api from "./axiosConfig";
 import ReceitaForm from "./ReceitaForm";
@@ -36,8 +37,26 @@ export default function ReceitaList() {
         api.get("/receitas"),
         api.get("/produtos"),
       ]);
-      setReceitas(receitasRes.data);
-      setProdutos(produtosRes.data);
+
+      /** ───── DEBUG ───── **/
+      console.log("Receitas da API:", receitasRes.data);
+      console.log("Produtos da API:", produtosRes.data);
+      /** ────────────────── **/
+
+      // Garantir que ambos são arrays
+      if (Array.isArray(receitasRes.data)) {
+        setReceitas(receitasRes.data);
+      } else {
+        console.error("Formato inválido: /receitas não retornou array.");
+        setReceitas([]);
+      }
+
+      if (Array.isArray(produtosRes.data)) {
+        setProdutos(produtosRes.data);
+      } else {
+        console.error("Formato inválido: /produtos não retornou array.");
+        setProdutos([]);
+      }
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
       alert("Erro ao carregar dados. Faça login novamente.");
@@ -61,9 +80,8 @@ export default function ReceitaList() {
     setShowForm(true);
   };
 
-  const getNomeProduto = (id: number) => {
-    return produtos.find((p) => p.id === id)?.nome || `ID ${id}`;
-  };
+  const getNomeProduto = (id: number) =>
+    produtos.find((p) => p.id === id)?.nome || `ID ${id}`;
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -71,20 +89,26 @@ export default function ReceitaList() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2>Receitas</h2>
-        <button onClick={logout} style={{ background: "#c00", color: "white", border: "none", padding: "8px 12px", borderRadius: 4 }}>
+    <div className="p-5">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Receitas</h2>
+        <button
+          onClick={logout}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
           Sair
         </button>
       </div>
 
-      <button onClick={abrirNovo} style={{ margin: "1rem 0" }}>
+      <button
+        onClick={abrirNovo}
+        className="mb-4 bg-blue-600 text-white px-4 py-2 rounded"
+      >
         + Nova Receita
       </button>
 
       {showForm && (
-        <div style={{ border: "1px solid #ccc", padding: 16, marginBottom: "1rem" }}>
+        <div className="border p-4 mb-4 rounded">
           <ReceitaForm
             receitaId={receitaEditando}
             onSuccess={() => {
@@ -95,24 +119,26 @@ export default function ReceitaList() {
         </div>
       )}
 
-      <table border={1} cellPadding={8} style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
+      <table className="w-full border-collapse border rounded text-sm">
+        <thead className="bg-gray-100">
           <tr>
-            <th>Nome</th>
-            <th>Produto Final</th>
-            <th>Adicional (%)</th>
-            <th>Itens</th>
-            <th>Ações</th>
+            <th className="p-2 border">Nome</th>
+            <th className="p-2 border">Produto Final</th>
+            <th className="p-2 border">Adicional (%)</th>
+            <th className="p-2 border">Itens</th>
+            <th className="p-2 border">Ações</th>
           </tr>
         </thead>
         <tbody>
           {receitas.map((r) => (
-            <tr key={r.id}>
-              <td>{r.nome}</td>
-              <td>{getNomeProduto(r.produtoFinalId)} (ID {r.produtoFinalId})</td>
-              <td>{r.adicional.toFixed(2)}%</td>
-              <td>
-                <ul>
+            <tr key={r.id} className="border-t">
+              <td className="p-2 border">{r.nome}</td>
+              <td className="p-2 border">
+                {getNomeProduto(r.produtoFinalId)} (ID {r.produtoFinalId})
+              </td>
+              <td className="p-2 border">{r.adicional.toFixed(2)}%</td>
+              <td className="p-2 border">
+                <ul className="list-disc ml-4">
                   {r.itens.map((item, idx) => (
                     <li key={idx}>
                       {getNomeProduto(item.produtoId)}: {item.quantidade}
@@ -120,14 +146,29 @@ export default function ReceitaList() {
                   ))}
                 </ul>
               </td>
-              <td>
-                <button onClick={() => abrirEdicao(r.id)} style={{ marginRight: 8 }}>
+              <td className="p-2 border">
+                <button
+                  onClick={() => abrirEdicao(r.id)}
+                  className="mr-2 bg-yellow-500 text-white px-2 py-1 rounded"
+                >
                   Editar
                 </button>
-                <button onClick={() => excluirReceita(r.id)}>Excluir</button>
+                <button
+                  onClick={() => excluirReceita(r.id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded"
+                >
+                  Excluir
+                </button>
               </td>
             </tr>
           ))}
+          {receitas.length === 0 && (
+            <tr>
+              <td colSpan={5} className="text-center p-4 text-gray-500">
+                Nenhuma receita encontrada.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

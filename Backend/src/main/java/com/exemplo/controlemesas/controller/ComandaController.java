@@ -1,95 +1,69 @@
+// ComandaController.java
+// Nenhuma alteração é necessária aqui, pois a rota já chama o método de serviço correto.
+
 package com.exemplo.controlemesas.controller;
 
-import com.exemplo.controlemesas.dto.ComandaDTO;
-import com.exemplo.controlemesas.dto.ErrorResponse;
+import com.exemplo.controlemesas.dto.ComandaResumoDTO;
 import com.exemplo.controlemesas.model.Comanda;
-import com.exemplo.controlemesas.repository.ComandaRepository;
 import com.exemplo.controlemesas.services.ComandaService;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-
-import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/comandas")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*") 
 public class ComandaController {
 
-    @Autowired
-    private ComandaRepository comandaRepository;
+    private final ComandaService comandaService;
 
-    @Autowired
-    private ComandaService comandaService;
-
-    private ComandaDTO toDTO(Comanda comanda) {
-        ComandaDTO dto = new ComandaDTO();
-        dto.setId(comanda.getId());
-        dto.setMesaId(comanda.getMesa() != null ? comanda.getMesa().getId() : null);
-        dto.setStatus(comanda.getStatus().name());
-        dto.setDataAbertura(comanda.getDataAbertura() != null ? comanda.getDataAbertura().toString() : null);
-        dto.setDataFechamento(comanda.getDataFechamento() != null ? comanda.getDataFechamento().toString() : null);
-        return dto;
+    @GetMapping("/abertas")
+    public ResponseEntity<List<Comanda>> listarComandasAbertas() {
+        return ResponseEntity.ok(comandaService.listarComandasAbertas());
     }
-
-    @GetMapping
-    public List<ComandaDTO> listarTodas() {
-        return comandaRepository.findAll().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
+    
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
-        return comandaRepository.findById(id)
-                .map(comanda -> ResponseEntity.ok(toDTO(comanda)))
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Comanda> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(comandaService.buscarPorId(id));
     }
 
+    // ✅ A rota continua a chamar o método de serviço, que agora foi corrigido para buscar por status
     @GetMapping("/mesa/{mesaId}")
-    public ResponseEntity<List<ComandaDTO>> listarPorMesa(@PathVariable Long mesaId) {
-        List<Comanda> comandas = comandaRepository.findByMesaIdAndAtivoTrue(mesaId);
-        List<ComandaDTO> dtos = comandas.stream().map(this::toDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+    public ResponseEntity<List<Comanda>> buscarComandasAtivasPorMesa(@PathVariable Long mesaId) {
+        List<Comanda> comandasAtivas = comandaService.buscarComandasAtivasPorMesa(mesaId);
+        return ResponseEntity.ok(comandasAtivas);
     }
 
-    @PostMapping
-    public ResponseEntity<?> criar(@Valid @RequestBody ComandaDTO dto) {
-        try {
-            Comanda comanda = comandaService.criarComanda(dto.getMesaId());
-            return ResponseEntity.created(URI.create("/api/comandas/" + comanda.getId())).body(toDTO(comanda));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+    @PostMapping("/criar/{numeroMesa}")
+    public ResponseEntity<Comanda> criarComandaPorMesa(@PathVariable Integer numeroMesa) {
+        Comanda novaComanda = comandaService.abrirComanda(numeroMesa);
+        return new ResponseEntity<>(novaComanda, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/abrir")
+    public ResponseEntity<Comanda> abrirComanda(@RequestBody Comanda comanda) {
+        Comanda novaComanda = comandaService.abrirComanda(comanda);
+        return new ResponseEntity<>(novaComanda, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> excluir(@PathVariable Long id) {
-        return comandaRepository.findById(id).map(comanda -> {
-            comanda.setAtivo(false);
-            comandaRepository.save(comanda);
-            return ResponseEntity.noContent().build();
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> excluirComanda(@PathVariable Long id) {
+        comandaService.excluirComanda(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/fechar")
-    public ResponseEntity<?> fecharComanda(
+    public ResponseEntity<ComandaResumoDTO> fecharComanda(
             @PathVariable Long id,
             @RequestParam(required = false) String nomeCliente,
-            @RequestParam(required = false) String observacoes) {
-        try {
-            comandaService.fecharComanda(id, nomeCliente, observacoes);
-            return ResponseEntity.ok(Map.of("message", "Comanda finalizada com sucesso!"));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "Erro ao finalizar comanda."));
-        }
+            @RequestParam(required = false) String observacoes
+    ) throws IOException {
+        ComandaResumoDTO resumo = comandaService.fecharComanda(id, nomeCliente, observacoes);
+        return ResponseEntity.ok(resumo);
     }
 }

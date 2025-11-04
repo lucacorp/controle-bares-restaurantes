@@ -12,11 +12,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:5173")
 public class CFOPController {
 
-    @Autowired
-    private CFOPRepository cfopRepository;
+	@Autowired
+	private CFOPRepository cfopRepository;
 
-    @GetMapping
-    public List<CFOP> listarTodos() {
-        return cfopRepository.findAll();
-    }
+	@GetMapping
+	public List<CFOP> listarTodos() {
+		return cfopRepository.findAll();
+	}
 }

@@ -10,18 +10,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsuarioService implements UserDetailsService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+	@Autowired
+	private UsuarioRepository usuarioRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email)
+	@Override
+public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    Usuario usuario = usuarioRepository.findByEmail(email)
             .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
-        return User.builder()
-                .username(usuario.getEmail())
-                .password(usuario.getSenha()) // deve estar encriptada
-                .roles("USER") // ou admin, etc
-                .build();
-    }
+    return User.builder()
+            .username(usuario.getEmail())
+            .password(usuario.getSenha()) // encriptada
+            .roles(usuario.getRole().toUpperCase()) // ← pega do banco
+            .build();
+}
+
+
 }
