@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -26,12 +27,21 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilte
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
+            // allow preflight CORS OPTIONS requests
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(
-            		"/api/auth/**",
+                    "/api/auth/**",
+                    "/api/comanda-resumo/**",
                     "/comanda/publica/**",
                     "/public/**",
-                    "/api/produtos/publicos",
+                    "/api/produtos/**",
+                    "/api/itens-comanda/**",
                     "/api/comandas/**",   // 👈 libera acesso público para comandas
+                    "/api/cfop/**",      // 👈 libera acesso público para lookup CFOP
+                    "/api/cst/**",       // 👈 libera acesso público para lookup CST
+                    "/api/origem/**",    // 👈 libera acesso público para lookup Origem
+                    "/api/receitas/**",  // 👈 libera acesso público para receitas
+                    "/api/configuracoes/**", // 👈 libera acesso público para configurações
                     "/api/mesas/**",      // 👈 libera acesso público para mesas
                     "/"
             ).permitAll()
@@ -42,12 +52,12 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilte
             // 👇 O restante requer autenticação genérica
             .anyRequest().authenticated()
         )
-        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // register JWT filter after configuring session management
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-}
-
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -62,14 +72,14 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilte
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-            "http://localhost:5173",
-            "http://192.168.200.107:5173"
-           
-        ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Use allowed origin patterns to allow wildcard origins during debugging (works with credentials)
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
+        // Allow any header to avoid preflight rejection; keep Authorization exposed so frontend can read it
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
