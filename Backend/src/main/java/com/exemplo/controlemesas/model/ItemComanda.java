@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Objects;
 
 
 @Entity
@@ -15,7 +16,7 @@ public class ItemComanda {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER) // ✅ Corrija aqui
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "produto_id")
     private Produto produto;
     
@@ -36,11 +37,13 @@ public class ItemComanda {
     @Enumerated(EnumType.STRING)
     private StatusItemComanda status = StatusItemComanda.PENDENTE;
 
-   
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comanda_id")
     @JsonIgnore
     private Comanda comanda;
+
+    @Version
+    private Long version;
 
     // Construtor
     public ItemComanda() {
@@ -127,5 +130,27 @@ public class ItemComanda {
 
     public void setFabricacaoPropria(boolean fabricacaoPropria) {
         this.fabricacaoPropria = fabricacaoPropria;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ItemComanda)) return false;
+        ItemComanda that = (ItemComanda) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        // use id when available to satisfy equals/hashCode contract
+        return Objects.hashCode(id);
     }
 }

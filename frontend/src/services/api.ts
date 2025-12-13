@@ -1,25 +1,20 @@
+// src/services/api.ts
 import axios from "axios";
-import { logout } from "../authService";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "http://localhost:8080/api", // ajuste se seu backend usar outra porta/host
   headers: {
-    "Content-Type": "application/json", // garante JSON
+    "Content-Type": "application/json",
   },
+  timeout: 10000,
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
+// interceptor simples para log e mensagem de erro padronizada
 api.interceptors.response.use(
-  (response) => response,
+  (resp) => resp,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      logout();
-    }
+    // opcional: log centralizado
+    console.error("API ERROR:", error?.response?.status, error?.response?.data);
     return Promise.reject(error);
   }
 );

@@ -1,0 +1,3 @@
+2025-11-23T20:52:36.402803300-03:00 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121675470660.xml",1,1,1) | BANNER: ACBrMonitorPLUS Ver. 1.4.0.374 - x86 | RESP: Conectado em: 23/11/25 20:52:36
+2025-11-23T21:27:29.386175-03:00 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121594355470.xml",1,1,1) | BANNER: ACBrMonitorPLUS Ver. 1.4.0.374 - x86 | RESP: Maquina: 127.0.0.1
+2025-11-24T01:29:52.251808500-03:00 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121220015450.xml",1,1,1) | BANNER: ACBrMonitorPLUS Ver. 1.4.0.374 - x86 | RESP: Maquina: 127.0.0.1

@@ -1,0 +1,327 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.exemplo:controle-mesas >---------------------
+[INFO] Building controle-mesas 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.2.4:run (default-cli) > test-compile @ controle-mesas >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ controle-mesas ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 0 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ controle-mesas ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 103 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/config/GlobalExceptionHandler.java:[9,8] class ExceptionLogger is public, should be declared in a file named ExceptionLogger.java
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[35,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[39,21] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[75,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[43,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[64,21] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[70,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[153,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[158,17] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[163,21] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[168,25] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[172,21] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[177,25] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[189,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[200,17] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[212,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[50,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[55,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[105,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[124,17] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[125,17] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[130,13] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[26,62] cannot find symbol
+  symbol:   method getValor()
+  location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[26,48] cannot find symbol
+  symbol:   method getChave()
+  location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[27,24] incompatible types: java.util.List<java.lang.Object> cannot be converted to java.util.List<com.exemplo.controlemesas.dto.ConfiguracaoDTO>
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[31,39] cannot find symbol
+  symbol:   method getChave()
+  location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[32,73] cannot find symbol
+  symbol:   method getValor()
+  location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[32,57] cannot find symbol
+  symbol:   method getChave()
+  location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[33,25] cannot find symbol
+  symbol:   method getValor()
+  location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[38,51] cannot find symbol
+  symbol:   method getValor()
+  location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[38,37] cannot find symbol
+  symbol:   method getChave()
+  location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[56,20] constructor ConfiguracaoDTO in class com.exemplo.controlemesas.dto.ConfiguracaoDTO cannot be applied to given types;
+  required: no arguments
+  found:    java.lang.String,java.lang.String
+  reason: actual and formal argument lists differ in length
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[66,25] invalid method reference
+  cannot find symbol
+    symbol:   method getValor()
+    location: class com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[85,19] constructor Configuracao in class com.exemplo.controlemesas.model.Configuracao cannot be applied to given types;
+  required: no arguments
+  found:    <nulltype>,java.lang.String,java.lang.String
+  reason: actual and formal argument lists differ in length
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[60,92] cannot find symbol
+  symbol:   method getCidade()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[70,39] cannot find symbol
+  symbol:   method getLogradouro()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[71,38] cannot find symbol
+  symbol:   method getNumero()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[72,42] cannot find symbol
+  symbol:   method getBairro()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[73,58] cannot find symbol
+  symbol:   method getCidade()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[74,39] cannot find symbol
+  symbol:   method getCidade()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[74,65] cannot find symbol
+  symbol:   method getCidade()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[75,37] cannot find symbol
+  symbol:   method getUf()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[76,38] cannot find symbol
+  symbol:   method getCep()
+  location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/util/FilesHelper.java:[36,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.util.FilesHelper
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[55,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[57,9] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[99,17] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[109,16] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[110,16] cannot find symbol
+  symbol:   variable log
+  location: class com.exemplo.controlemesas.services.SatService
+[INFO] 49 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.344 s
+[INFO] Finished at: 2025-11-06T08:36:34-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project controle-mesas: Compilation failure: Compilation failure: 
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/config/GlobalExceptionHandler.java:[9,8] class ExceptionLogger is public, should be declared in a file named ExceptionLogger.java
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[35,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[39,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ItemComandaService.java:[75,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ItemComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[43,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[64,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/security/JwtAuthenticationFilter.java:[70,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.security.JwtAuthenticationFilter
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[153,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[158,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[163,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[168,25] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[172,21] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[177,25] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[189,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[200,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ComandaService.java:[212,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.ComandaService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[50,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[55,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[105,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[124,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[125,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/NfeService.java:[130,13] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.NfeService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[26,62] cannot find symbol
+[ERROR]   symbol:   method getValor()
+[ERROR]   location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[26,48] cannot find symbol
+[ERROR]   symbol:   method getChave()
+[ERROR]   location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[27,24] incompatible types: java.util.List<java.lang.Object> cannot be converted to java.util.List<com.exemplo.controlemesas.dto.ConfiguracaoDTO>
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[31,39] cannot find symbol
+[ERROR]   symbol:   method getChave()
+[ERROR]   location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[32,73] cannot find symbol
+[ERROR]   symbol:   method getValor()
+[ERROR]   location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[32,57] cannot find symbol
+[ERROR]   symbol:   method getChave()
+[ERROR]   location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[33,25] cannot find symbol
+[ERROR]   symbol:   method getValor()
+[ERROR]   location: variable dto of type com.exemplo.controlemesas.dto.ConfiguracaoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[38,51] cannot find symbol
+[ERROR]   symbol:   method getValor()
+[ERROR]   location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[38,37] cannot find symbol
+[ERROR]   symbol:   method getChave()
+[ERROR]   location: variable c of type com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[56,20] constructor ConfiguracaoDTO in class com.exemplo.controlemesas.dto.ConfiguracaoDTO cannot be applied to given types;
+[ERROR]   required: no arguments
+[ERROR]   found:    java.lang.String,java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[66,25] invalid method reference
+[ERROR]   cannot find symbol
+[ERROR]     symbol:   method getValor()
+[ERROR]     location: class com.exemplo.controlemesas.model.Configuracao
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/ConfiguracaoService.java:[85,19] constructor Configuracao in class com.exemplo.controlemesas.model.Configuracao cannot be applied to given types;
+[ERROR]   required: no arguments
+[ERROR]   found:    <nulltype>,java.lang.String,java.lang.String
+[ERROR]   reason: actual and formal argument lists differ in length
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[60,92] cannot find symbol
+[ERROR]   symbol:   method getCidade()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[70,39] cannot find symbol
+[ERROR]   symbol:   method getLogradouro()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[71,38] cannot find symbol
+[ERROR]   symbol:   method getNumero()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[72,42] cannot find symbol
+[ERROR]   symbol:   method getBairro()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[73,58] cannot find symbol
+[ERROR]   symbol:   method getCidade()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[74,39] cannot find symbol
+[ERROR]   symbol:   method getCidade()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[74,65] cannot find symbol
+[ERROR]   symbol:   method getCidade()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[75,37] cannot find symbol
+[ERROR]   symbol:   method getUf()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/nfe/NfeXmlBuilder.java:[76,38] cannot find symbol
+[ERROR]   symbol:   method getCep()
+[ERROR]   location: variable end of type com.exemplo.controlemesas.dto.ConfiguracaoEnderecoDTO
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/util/FilesHelper.java:[36,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.util.FilesHelper
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[55,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[57,9] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[99,17] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[109,16] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.SatService
+[ERROR] /C:/controle-bares-restaurantes/Backend/src/main/java/com/exemplo/controlemesas/services/SatService.java:[110,16] cannot find symbol
+[ERROR]   symbol:   variable log
+[ERROR]   location: class com.exemplo.controlemesas.services.SatService
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

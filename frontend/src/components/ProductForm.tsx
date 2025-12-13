@@ -1,5 +1,3 @@
-// src/components/ProductForm.tsx
-
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
@@ -12,6 +10,8 @@ export default function ProductForm({
   onSave?: () => void;
 }) {
   const [produto, setProduto] = useState({
+    id: undefined as number | undefined,
+    version: undefined as number | undefined,
     codigo: '',
     codigo_barras: '',
     nome: '',
@@ -33,9 +33,9 @@ export default function ProductForm({
     estoqueAtual: 0
   });
 
-  const [cfopList, setCfopList] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [cstList, setCstList] = useState<{ codigo: string; descricao: string }[]>([]);
-  const [origemList, setOrigemList] = useState<{ codigo: string; descricao: string }[]>([]);
+  const [cfopList, setCfopList] = useState<{ id: number; codigo: string; descricao: string }[]>([]);
+  const [cstList, setCstList] = useState<{ id: number; codigo: string; descricao: string }[]>([]);
+  const [origemList, setOrigemList] = useState<{ id: number; codigo: string; descricao: string }[]>([]);
   const [icmsList] = useState<string[]>(['0', '7', '12', '17', '18', '25']);
   const [loading, setLoading] = useState(false);
 
@@ -45,7 +45,34 @@ export default function ProductForm({
       try {
         if (id) {
           const response = await api.get(`/produtos/${id}`);
-          setProduto(response.data);
+          const data = response.data;
+          setProduto({
+            id: data.id,
+            version: data.version,
+            codigo: data.codigo || '',
+            codigo_barras: data.codigo_barras || data.codigoBarras || '',
+            nome: data.nome || '',
+            descricao: data.descricao || '',
+            grupo: data.grupo || '',
+            categoria: data.categoria || '',
+            unidade: data.unidade || '',
+            preco: (typeof data.precoVenda === 'number')
+              ? data.precoVenda.toString()
+              : (data.precoVenda || ''),
+            preco_custo: (typeof data.preco === 'number')
+              ? data.preco.toString()
+              : (data.preco || ''),
+            ncm: data.ncm || '',
+            cfop: data.cfop?.id ? String(data.cfop.id) : '',
+            cst: data.cst?.id ? String(data.cst.id) : '',
+            origem: data.origem?.id ? String(data.origem.id) : '',
+            aliquota_icms: (typeof data.aliquotaIcms === 'number') ? data.aliquotaIcms.toString() : (data.aliquotaIcms || ''),
+            aliquota_ipi: (typeof data.aliquotaIpi === 'number') ? data.aliquotaIpi.toString() : (data.aliquotaIpi || ''),
+            familia: data.familia || '',
+            materiaPrima: !!data.materiaPrima,
+            fabricacaoPropria: !!data.fabricacaoPropria,
+            estoqueAtual: typeof data.estoqueAtual === 'number' ? data.estoqueAtual : 0
+          });
         }
 
         const [cfopData, cstData, origemData] = await Promise.all([
@@ -68,7 +95,9 @@ export default function ProductForm({
     fetchData();
   }, [id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type, checked } = e.target;
 
     if (type === 'checkbox') {
@@ -83,24 +112,36 @@ export default function ProductForm({
     if (name === 'codigo_barras') {
       const numeric = value.replace(/\D/g, '');
       if (numeric.length > 13) return;
-      setProduto((prev) => ({ ...prev, [name]: numeric }));
+      setProduto((prev) => ({ ...prev, codigo_barras: numeric }));
       return;
     }
 
     if (name === 'preco' || name === 'preco_custo') {
       const numeric = value.replace(/[^\d]/g, '');
-      const formatted = (Number(numeric) / 100).toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
+      const formatted =
+        numeric === ''
+          ? ''
+          : (Number(numeric) / 100).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
       setProduto((prev) => ({ ...prev, [name]: formatted }));
+      return;
+    }
+
+    if (name === 'estoqueAtual') {
+      const numeric = value.replace(/\D/g, '');
+      setProduto((prev) => ({
+        ...prev,
+        estoqueAtual: numeric === '' ? 0 : parseInt(numeric)
+      }));
       return;
     }
 
     if (name === 'ncm') {
       const numeric = value.replace(/\D/g, '');
       if (numeric.length > 8) return;
-      setProduto((prev) => ({ ...prev, [name]: numeric }));
+      setProduto((prev) => ({ ...prev, ncm: numeric }));
       return;
     }
 
@@ -118,19 +159,68 @@ export default function ProductForm({
     setProduto((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isEmptyField = (value: string | undefined) => {
+    return value === undefined || value.trim() === '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!produto.nome.trim() || !produto.preco || !produto.codigo_barras) {
-      toast.warning('Preencha nome, preço e código de barras.');
+    // Validação
+    if (
+      isEmptyField(produto.nome) ||
+      isEmptyField(produto.preco) ||
+      isEmptyField(produto.preco_custo) ||
+      isEmptyField(produto.codigo_barras) ||
+      isEmptyField(produto.unidade) ||
+      isEmptyField(produto.cfop) ||
+      isEmptyField(produto.cst) ||
+      isEmptyField(produto.origem)
+    ) {
+      toast.warning('Preencha todos os campos obrigatórios.');
       return;
     }
+
+    const cfopObj = cfopList.find(cfop => String(cfop.id) === produto.cfop);
+    const cstObj = cstList.find(cst => String(cst.id) === produto.cst);
+    const origemObj = origemList.find(origem => String(origem.id) === produto.origem);
+
+    const payload: any = {
+      id: produto.id,
+      version: produto.version,
+      codigo: produto.codigo || undefined,
+      codigoBarras: produto.codigo_barras,
+      nome: produto.nome,
+      descricao: produto.descricao,
+      grupo: produto.grupo,
+      categoria: produto.categoria,
+      unidade: produto.unidade,
+      precoVenda: produto.preco ? Number(produto.preco.replace(',', '.')) : undefined,
+      preco: produto.preco_custo ? Number(produto.preco_custo.replace(',', '.')) : undefined,
+      ncm: produto.ncm || undefined,
+      cfop: cfopObj ? { id: cfopObj.id } : undefined,
+      cst: cstObj ? { id: cstObj.id } : undefined,
+      origem: origemObj ? { id: origemObj.id } : undefined,
+      aliquotaIcms: produto.aliquota_icms ? Number(produto.aliquota_icms.replace(',', '.')) : undefined,
+      aliquotaIpi: produto.aliquota_ipi ? Number(produto.aliquota_ipi.replace(',', '.')) : undefined,
+      familia: produto.familia,
+      materiaPrima: produto.materiaPrima,
+      fabricacaoPropria: produto.fabricacaoPropria,
+      estoqueAtual: produto.estoqueAtual
+    };
+
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === undefined) delete payload[key];
+    });
+
+    // Conferência do payload
+    console.log('Payload enviado:', payload);
 
     const method = id ? 'put' : 'post';
     const url = id ? `/produtos/${id}` : '/produtos';
 
     try {
-      await api[method](url, produto);
+      await api[method](url, payload);
       toast.success(`Produto ${id ? 'atualizado' : 'cadastrado'} com sucesso!`);
       if (onSave) onSave();
     } catch (error) {
@@ -141,6 +231,8 @@ export default function ProductForm({
 
   const handleReset = () => {
     setProduto({
+      id: undefined,
+      version: undefined,
       codigo: '',
       codigo_barras: '',
       nome: '',
@@ -168,21 +260,31 @@ export default function ProductForm({
       <h2 className="text-2xl font-bold text-gray-800">
         {id ? 'Editar Produto' : 'Novo Produto'}
       </h2>
-
-      {/* Seção: Identificação */}
+      {/* Identificação */}
       <section>
         <h3 className="text-lg font-semibold mb-2 border-b pb-1">Identificação</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input name="codigo" value={produto.codigo} readOnly placeholder="Código interno" className="p-2 border rounded bg-gray-100" />
+          <input name="codigo" value={produto.codigo} onChange={handleChange} placeholder="Código interno" className="p-2 border rounded" />
           <input name="codigo_barras" value={produto.codigo_barras} onChange={handleChange} placeholder="Código de Barras (EAN)" className="p-2 border rounded" />
           <input name="nome" value={produto.nome} onChange={handleChange} placeholder="Nome do Produto" className="p-2 border rounded" />
           <input name="grupo" value={produto.grupo} onChange={handleChange} placeholder="Grupo" className="p-2 border rounded" />
           <input name="categoria" value={produto.categoria} onChange={handleChange} placeholder="Categoria" className="p-2 border rounded" />
           <input name="familia" value={produto.familia} onChange={handleChange} placeholder="Família (ex: bar, cozinha...)" className="p-2 border rounded" />
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+          {/* Campo version somente leitura */}
+          <input
+            name="version"
+            value={produto.version ?? ''}
+            readOnly
+            className="p-2 border rounded bg-gray-100 text-gray-500"
+            placeholder="Version"
+            style={{ fontStyle: 'italic' }}
+          />
+        </div>
       </section>
 
-      {/* Seção: Preço e Estoque */}
+      {/* Preço e Estoque */}
       <section>
         <h3 className="text-lg font-semibold mb-2 border-b pb-1">Preço & Estoque</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -201,7 +303,7 @@ export default function ProductForm({
         </div>
       </section>
 
-      {/* Seção: Fiscal */}
+      {/* Informações Fiscais */}
       <section>
         <h3 className="text-lg font-semibold mb-2 border-b pb-1">Informações Fiscais</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -209,25 +311,19 @@ export default function ProductForm({
           <select name="cfop" value={produto.cfop} onChange={handleChange} className="p-2 border rounded">
             <option value="">CFOP</option>
             {cfopList.map(cfop => (
-              <option key={cfop.codigo} value={cfop.codigo}>
-                {cfop.codigo} - {cfop.descricao}
-              </option>
+              <option key={cfop.id} value={cfop.id}>{cfop.codigo} - {cfop.descricao}</option>
             ))}
           </select>
           <select name="cst" value={produto.cst} onChange={handleChange} className="p-2 border rounded">
             <option value="">CST</option>
             {cstList.map(cst => (
-              <option key={cst.codigo} value={cst.codigo}>
-                {cst.codigo} - {cst.descricao}
-              </option>
+              <option key={cst.id} value={cst.id}>{cst.codigo} - {cst.descricao}</option>
             ))}
           </select>
           <select name="origem" value={produto.origem} onChange={handleChange} className="p-2 border rounded">
             <option value="">Origem</option>
             {origemList.map(origem => (
-              <option key={origem.codigo} value={origem.codigo}>
-                {origem.codigo} - {origem.descricao}
-              </option>
+              <option key={origem.id} value={origem.id}>{origem.codigo} - {origem.descricao}</option>
             ))}
           </select>
           <select name="aliquota_icms" value={produto.aliquota_icms} onChange={handleChange} className="p-2 border rounded">

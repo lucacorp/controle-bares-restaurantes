@@ -1,5 +1,5 @@
 // src/components/EmitirCupomButton.tsx
-import axios from "axios";
+import api from "../services/api";
 import { Button } from "@/components/ui/button";
 import { useModoFiscal } from "@/hooks/useModoFiscal";
 
@@ -12,19 +12,19 @@ export function EmitirCupomButton({ resumoId }: Props) {
 
   const emitirSat = async () => {
     try {
-      await axios.post(`/api/comanda-resumo/${resumoId}/emitir-sat`);
+      await api.post(`/comanda-resumo/${resumoId}/emitir-sat`);
       alert("Cupom SAT emitido!");
     } catch (err: any) {
-      alert("Erro ao emitir SAT: " + err?.response?.data?.message || "Erro desconhecido");
+      alert("Erro ao emitir SAT: " + (err?.response?.data?.message || "Erro desconhecido"));
     }
   };
 
   const emitirNfce = async () => {
     try {
-      await axios.post(`/api/comanda-resumo/${resumoId}/emitir-nfe`);
+      await api.post(`/comanda-resumo/${resumoId}/emitir-nfe`);
       alert("NFC-e emitida!");
     } catch (err: any) {
-      alert("Erro ao emitir NFC-e: " + err?.response?.data?.message || "Erro desconhecido");
+      alert("Erro ao emitir NFC-e: " + (err?.response?.data?.message || "Erro desconhecido"));
     }
   };
 

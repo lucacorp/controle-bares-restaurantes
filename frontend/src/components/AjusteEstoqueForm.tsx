@@ -38,7 +38,7 @@ export default function AjusteEstoqueForm({ productId }: { productId: number }) 
     console.log("Payload enviado via Axios:", payload);
 
     try {
-      await api.post("/api/movimentacoes-estoque", payload);
+      await api.post("/movimentacoes-estoque", payload);
       alert("Movimentação realizada com sucesso!");
 
       setQuantidade(1);

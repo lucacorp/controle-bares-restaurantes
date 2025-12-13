@@ -4,4 +4,6 @@ export interface ComandaResumo {
   total: number;
   nomeCliente: string;
   observacoes: string;
+  statusSat?: string;
+  statusFiscal?: string;
 }

@@ -12,6 +12,7 @@ import ReceitaForm from "./components/ReceitaForm";
 import RotaProtegida from "./components/RotaProtegida";
 import ItensComandaPage from "./components/ItensComandaPage";
 import ComandaResumoPage from "./components/ComandaResumoPage";
+import ComandaFechamentoPage from "./components/ComandaFechamentoPage";
 import SidebarLayout from "./components/SidebarLayout";
 import ProductManager from "./components/ProductManager";
 import ConfigPage from "./components/ConfigPage";
@@ -79,6 +80,7 @@ function App() {
           {/* Comandas */}
           <Route path="/comandas/resumos" element={<ComandaResumoPage />} />
           <Route path="/comandas/:id/itens" element={<ItensComandaWrapper />} />
+          <Route path="/comandas/:id/fechar" element={<ComandaFechamentoPage />} />
         </Route>
 
         {/* Fallback */}

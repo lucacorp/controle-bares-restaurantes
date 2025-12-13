@@ -5,4 +5,6 @@ export interface ComandaResumoDTO {
   valorTotal: number;
   nomeCliente: string;
   observacoes: string;
+  statusSat?: string;
+  statusFiscal?: string;
 }

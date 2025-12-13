@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/itens-comanda")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class ItemComandaController {
     private final ItemComandaService itemComandaService;
 
     @PostMapping
-    public ResponseEntity<?> adicionarItem(@RequestBody ItemComandaRequestDTO dto) {
+    public ResponseEntity<?> adicionarItem(@Valid @RequestBody ItemComandaRequestDTO dto) {
         try {
             ItemComandaDTO novoItem = itemComandaService.adicionarItem(dto);
             return new ResponseEntity<>(novoItem, HttpStatus.CREATED);

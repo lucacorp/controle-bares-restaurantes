@@ -75,6 +75,11 @@ public class ConfiguracaoService {
         }
     }
 
+    public boolean getBoolean(String chave, boolean def) {
+        String valor = get(chave, String.valueOf(def));
+        return "true".equalsIgnoreCase(valor);
+    }
+
     /* ------------------------ NOVO: MODO FISCAL ------------------------ */
 
     public String getModoFiscal() {

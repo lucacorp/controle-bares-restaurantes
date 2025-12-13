@@ -1,141 +1,122 @@
+// src/pages/ComandasMesaPage.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { Loader2 } from "lucide-react";
 
-interface Produto {
+interface ComandaResumo {
   id: number;
-  nome: string;
-  precoVenda: number;
+  status?: string;
+  ativa?: boolean;
+  dataAbertura?: string;
+  dataFechamento?: string | null;
+  itensCount?: number;
 }
 
-interface ItemComanda {
-  id: number;
-  quantidade: number;
-  produto: Produto;
-}
+export default function ComandasMesaPage() {
+  const { mesaId } = useParams<{ mesaId: string }>();
+  const navigate = useNavigate();
+  const [comandas, setComandas] = useState<ComandaResumo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [criando, setCriando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
-interface Comanda {
-  id: number;
-  mesaId: number;
-  ativa: boolean;
-  itens: ItemComanda[];
-}
+  const loadComandas = async () => {
+    if (!mesaId) return;
+    setLoading(true);
+    setErro(null);
+    try {
+      // busca todas as comandas da mesa (ajuste no backend: retorna LIST)
+      const resp = await api.get(`/comandas/mesa/${mesaId}`);
+      // filtra apenas ABERTAS (se quiser exibir apenas abertas)
+      const lista: ComandaResumo[] = Array.isArray(resp.data) ? resp.data : [];
+      setComandas(lista);
+    } catch (err: any) {
+      console.error("Erro loadComandas:", err);
+      setErro(err?.response?.data?.message || "Falha ao carregar comandas.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const ComandaPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [comandas, setComandas] = useState<Comanda[]>([]);
-  const [mensagem, setMensagem] = useState<string>("");
+  const criarComanda = async () => {
+    if (!mesaId) return;
+    setCriando(true);
+    try {
+      const resp = await api.post(`/comandas/criar/${mesaId}`);
+      // abre a página de itens da nova comanda
+      const novaId = resp.data?.id;
+      if (novaId) {
+        navigate(`/comandas/${novaId}/itens?mesaId=${mesaId}`);
+      } else {
+        // se backend retornar objeto diferente, recarrega lista
+        await loadComandas();
+      }
+    } catch (err: any) {
+      console.error("Erro criarComanda:", err);
+      alert(err?.response?.data?.message || "Falha ao criar comanda.");
+    } finally {
+      setCriando(false);
+      loadComandas();
+    }
+  };
 
   useEffect(() => {
-    carregarComandas();
-  }, [id]);
-
-  const carregarComandas = async () => {
-    try {
-      const { data } = await api.get(`/comandas/mesa/${id}`);
-      setComandas(Array.isArray(data) ? data : []);
-      setMensagem("");
-    } catch (e: any) {
-      setMensagem(e.response?.data?.message || "Erro ao carregar comandas.");
-    }
-  };
-
-  const handleFecharComanda = async (comandaId: number) => {
-    try {
-      await api.put(`/comandas/${comandaId}/fechar`);
-      setMensagem("Comanda fechada com sucesso!");
-      carregarComandas();
-    } catch (e: any) {
-      setMensagem(e.response?.data?.message || "Erro ao fechar comanda.");
-    }
-  };
-
-  const handleExcluirComanda = async (comandaId: number) => {
-    try {
-      await api.delete(`/comandas/${comandaId}`);
-      setMensagem("Comanda excluída com sucesso!");
-      carregarComandas();
-    } catch (e: any) {
-      setMensagem(e.response?.data?.message || "Erro ao excluir comanda.");
-    }
-  };
-
-  const calcularTotal = (itens: ItemComanda[]) =>
-    itens.reduce((sum, item) => sum + (item.produto?.precoVenda || 0) * (item.quantidade || 0), 0);
+    loadComandas();
+  }, [mesaId]);
 
   return (
-    <div className="container mt-4">
-      <h2>Comandas da Mesa {id}</h2>
+    <div className="p-4 max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Comandas da Mesa #{mesaId}</h2>
+      {erro && <p className="text-red-500 mb-4">{erro}</p>}
 
-      {mensagem && <div className="alert alert-info mt-3">{mensagem}</div>}
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={criarComanda}
+          disabled={criando}
+          className="px-4 py-2 bg-green-600 text-white rounded"
+        >
+          {criando ? <Loader2 className="w-4 h-4 inline-block animate-spin mr-2" /> : null}
+          Nova Comanda
+        </button>
 
-      {comandas.length === 0 ? (
-        <p>Nenhuma comanda encontrada para esta mesa.</p>
+        <button
+          onClick={loadComandas}
+          disabled={loading}
+          className="px-3 py-2 border rounded"
+        >
+          {loading ? <Loader2 className="w-4 h-4 inline-block animate-spin mr-2" /> : "Atualizar"}
+        </button>
+      </div>
+
+      {loading ? (
+        <p>Carregando comandas...</p>
+      ) : comandas.length === 0 ? (
+        <p className="text-gray-500">Nenhuma comanda encontrada para esta mesa.</p>
       ) : (
-        comandas.map((c) => (
-          <div key={c.id} className="card mt-4">
-            <div className="card-header d-flex justify-content-between align-items-center">
-              <h5>Comanda {c.id}</h5>
-              {c.ativa && (
-                <div>
-                  <button
-                    className="btn btn-sm btn-success me-2"
-                    onClick={() => handleFecharComanda(c.id)}
-                  >
-                    Fechar Comanda
-                  </button>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleExcluirComanda(c.id)}
-                  >
-                    Excluir Comanda
-                  </button>
-                </div>
-              )}
-            </div>
+        <ul className="space-y-3">
+          {comandas.map((c) => (
+            <li key={c.id} className="p-3 border rounded-lg flex justify-between items-center hover:bg-gray-50">
+              <div>
+                <p className="font-semibold">Comanda #{c.id}</p>
+                <p className="text-sm text-gray-500">
+                  Status: {c.status ?? (c.ativa ? "ABERTA" : "FECHADA")}{" "}
+                  {c.dataAbertura ? `| ${new Date(c.dataAbertura).toLocaleString()}` : ""}
+                </p>
+              </div>
 
-            <div className="card-body">
-              {c.itens.length === 0 ? (
-                <p>Nenhum item nesta comanda.</p>
-              ) : (
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th>Descrição</th>
-                      <th>Qtd</th>
-                      <th>Preço</th>
-                      <th>Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {c.itens.map((item) => (
-                      <tr key={item.id}>
-                        <td>{item.produto?.nome || "Produto"}</td>
-                        <td>{item.quantidade}</td>
-                        <td>R$ {(item.produto?.precoVenda || 0).toFixed(2)}</td>
-                        <td>
-                          R${" "}
-                          {((item.produto?.precoVenda || 0) * (item.quantidade || 0)).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={3} className="text-end fw-bold">
-                        Total:
-                      </td>
-                      <td className="fw-bold">R$ {calcularTotal(c.itens).toFixed(2)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              )}
-            </div>
-          </div>
-        ))
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigate(`/comandas/${c.id}/itens?mesaId=${mesaId}`)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded"
+                >
+                  Ver Itens
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
-};
-
-export default ComandaPage;
+}

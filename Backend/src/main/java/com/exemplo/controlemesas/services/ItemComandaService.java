@@ -48,6 +48,18 @@ public class ItemComandaService {
         Produto produto = produtoRepository.findById(dto.getProdutoId())
                 .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado"));
 
+        // Validate quantidade
+        if (dto.getQuantidade() == null || dto.getQuantidade() <= 0) {
+            throw new IllegalArgumentException("Quantidade inválida. Deve ser maior que zero.");
+        }
+
+        // Validate price
+        BigDecimal precoVenda = produto.getPrecoVenda();
+        if (precoVenda == null || precoVenda.compareTo(BigDecimal.ZERO) <= 0) {
+            log.error("Produto {} tem preço inválido: {}", produto.getId(), precoVenda);
+            throw new IllegalArgumentException("Preço de venda do produto inválido. Verifique o cadastro do produto.");
+        }
+
         ItemComanda item = new ItemComanda();
         item.setComanda(comanda);
         item.setProduto(produto);
@@ -55,11 +67,11 @@ public class ItemComandaService {
         item.setDataRegistro(LocalDateTime.now());
         item.setStatus(StatusItemComanda.PENDENTE);
 
-        BigDecimal precoVenda = produto.getPrecoVenda();
+        // set price and let the entity recalculate total via setter
         item.setPrecoVenda(precoVenda);
-
-        BigDecimal total = precoVenda.multiply(BigDecimal.valueOf(dto.getQuantidade()));
-        item.setTotal(total);
+        // ensure total recalculated (setPrecoVenda/setQuantidade call calcularTotal already)
+        // but call calcularTotal explicitly to be safe
+        item.calcularTotal();
 
         ItemComanda salvo = itemComandaRepository.save(item);
         log.info("Item adicionado com sucesso à comanda {}", comanda.getId());

@@ -11,6 +11,9 @@ public class ComandaResumoDTO {
     private Long comandaId;
     private LocalDateTime dataFechamento;
     private BigDecimal total;
+    private String statusSat; // compatibilidade com backend/antigo SAT
+    // campo mais genérico para UI/uso com NFC-e
+    private String statusFiscal;
     private String nomeCliente;
     private String observacoes;
 
@@ -31,6 +34,9 @@ public class ComandaResumoDTO {
         this.total = resumo.getTotal();
         this.nomeCliente = resumo.getNomeCliente();
         this.observacoes = resumo.getObservacoes();
+        // preencher estado fiscal a partir do campo existente (compatibilidade)
+        this.statusSat = resumo.getStatusSat();
+        this.statusFiscal = resumo.getStatusFiscal();
     }
     
     // Getters e Setters (mantenha os seus)
@@ -46,4 +52,8 @@ public class ComandaResumoDTO {
     public void setNomeCliente(String nomeCliente) { this.nomeCliente = nomeCliente; }
     public String getObservacoes() { return observacoes; }
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+    public String getStatusSat() { return statusSat; }
+    public void setStatusSat(String statusSat) { this.statusSat = statusSat; }
+    public String getStatusFiscal() { return statusFiscal; }
+    public void setStatusFiscal(String statusFiscal) { this.statusFiscal = statusFiscal; }
 }

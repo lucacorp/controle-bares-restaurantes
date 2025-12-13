@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "comanda_resumo")
@@ -14,7 +15,7 @@ public class ComandaResumo {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "comanda_id")
 	@com.fasterxml.jackson.annotation.JsonIgnore
 	private Comanda comanda;
@@ -40,8 +41,11 @@ public class ComandaResumo {
 	private String statusSat = "PENDENTE";
 	private String xmlPath;
 
-	@OneToMany(mappedBy = "comandaResumo", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "comandaResumo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<ItemComandaResumo> itens = new ArrayList<>();
+
+	@Version
+	private Long version;
 
 	// ====== Getters e Setters ======
 	public Long getId() {
@@ -156,6 +160,16 @@ public class ComandaResumo {
 		this.statusSat = statusSat;
 	}
 
+	// Alias mais genérico para status fiscal (NFC-e / SAT). Mantém compatibilidade
+	// com código existente que usa 'statusSat', mas permite usar um nome neutro.
+	public String getStatusFiscal() {
+		return this.statusSat;
+	}
+
+	public void setStatusFiscal(String statusFiscal) {
+		this.statusSat = statusFiscal;
+	}
+
 	public String getXmlPath() {
 		return xmlPath;
 	}
@@ -178,5 +192,21 @@ public class ComandaResumo {
 
 	public void setPdfPath(String pdfPath) {
 	    this.pdfPath = pdfPath;
+	}
+
+	public Long getVersion() { return version; }
+	public void setVersion(Long version) { this.version = version; }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ComandaResumo)) return false;
+		ComandaResumo that = (ComandaResumo) o;
+		return id != null && Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
 	}
 }

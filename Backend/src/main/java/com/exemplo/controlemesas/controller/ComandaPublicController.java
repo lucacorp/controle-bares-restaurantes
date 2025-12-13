@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/public/comanda")
 public class ComandaPublicController {
@@ -23,7 +25,7 @@ public class ComandaPublicController {
 
     @PostMapping("/{comandaId}/pedido")
     public ResponseEntity<ItemComandaDTO> adicionarPedido(@PathVariable Long comandaId,
-                                                          @RequestBody ItemComandaRequestDTO dto) {
+                                                          @Valid @RequestBody ItemComandaRequestDTO dto) {
         dto.setComandaId(comandaId);
         return ResponseEntity.ok(itemComandaService.adicionarItem(dto));
     }

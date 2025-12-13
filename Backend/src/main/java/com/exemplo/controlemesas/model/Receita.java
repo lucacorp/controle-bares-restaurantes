@@ -69,7 +69,28 @@ public class Receita {
 	}
 
 	public void setItens(List<ReceitaItem> itens) {
-		this.itens = itens;
+		// do not replace the collection instance when using orphanRemoval=true
+		// remove existing items safely
+		if (this.itens == null) {
+			this.itens = new java.util.ArrayList<>();
+		}
+
+		// remove back-references for items that are no longer present
+		java.util.List<ReceitaItem> copia = new java.util.ArrayList<>(this.itens);
+		for (ReceitaItem it : copia) {
+			if (itens == null || !itens.contains(it)) {
+				removeItem(it);
+			}
+		}
+
+		// add or update incoming items, keeping back-references
+		if (itens != null) {
+			for (ReceitaItem it : itens) {
+				if (!this.itens.contains(it)) {
+					addItem(it);
+				}
+			}
+		}
 	}
 
 	public void addItem(ReceitaItem item) {

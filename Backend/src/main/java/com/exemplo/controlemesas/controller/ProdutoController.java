@@ -39,6 +39,29 @@ public class ProdutoController {
         return ResponseEntity.ok(new ProdutoDTO(salvo));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoDTO> atualizar(@PathVariable Long id, @RequestBody Produto produto) {
+        return produtoRepository.findById(id).map(existing -> {
+            // update allowed fields (keep id/version)
+            existing.setCodigoBarras(produto.getCodigoBarras());
+            existing.setNome(produto.getNome());
+            existing.setGrupo(produto.getGrupo());
+            existing.setUnidade(produto.getUnidade());
+            existing.setPrecoVenda(produto.getPrecoVenda());
+            existing.setCategoria(produto.getCategoria());
+            existing.setDescricao(produto.getDescricao());
+            existing.setPreco(produto.getPreco());
+            existing.setFabricacaoPropria(produto.isFabricacaoPropria());
+            existing.setCfop(produto.getCfop());
+            existing.setCst(produto.getCst());
+            existing.setOrigem(produto.getOrigem());
+            existing.setAliquotaIcms(produto.getAliquotaIcms());
+            existing.setAliquotaIpi(produto.getAliquotaIpi());
+            Produto salvo = produtoRepository.save(existing);
+            return ResponseEntity.ok(new ProdutoDTO(salvo));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         if (!produtoRepository.existsById(id)) {

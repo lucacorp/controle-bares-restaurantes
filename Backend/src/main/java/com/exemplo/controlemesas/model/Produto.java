@@ -2,6 +2,7 @@ package com.exemplo.controlemesas.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 @Entity
 @Table(name = "produtos")
@@ -42,6 +43,9 @@ public class Produto {
 
     private Double aliquotaIcms;
     private Double aliquotaIpi;
+
+    @Version
+    private Long version;
 
     // ===== Getters e Setters =====
     public Long getId() { return id; }
@@ -91,5 +95,22 @@ public class Produto {
 
     public void setFabricacaoPropria(boolean fabricacaoPropria) {
         this.fabricacaoPropria = fabricacaoPropria;
+    }
+
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Produto)) return false;
+        Produto produto = (Produto) o;
+        return id != null && Objects.equals(id, produto.id);
+    }
+
+    @Override
+    public int hashCode() {
+        // use id when available to satisfy equals/hashCode contract
+        return Objects.hashCode(id);
     }
 }

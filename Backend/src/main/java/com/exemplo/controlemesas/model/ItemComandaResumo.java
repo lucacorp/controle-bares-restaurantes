@@ -2,6 +2,7 @@ package com.exemplo.controlemesas.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Table(name = "item_comanda_resumo")
@@ -48,16 +49,66 @@ public class ItemComandaResumo {
 
     // ✅ CORREÇÃO: Construtor que aceita um objeto ItemComanda, mapeando corretamente os campos
     public ItemComandaResumo(ItemComanda item) {
-        this.produtoId = item.getProduto().getId();
-        this.descricao = item.getProduto().getNome();
-        this.unMedida = "UN"; // Exemplo, ajuste conforme a sua lógica
-        
-        // CORREÇÃO: Converte a quantidade de Integer para BigDecimal
-        this.quantidade = new BigDecimal(item.getQuantidade());
-        
-        // CORREÇÃO: Usa o método getPrecoVenda() que existe na classe ItemComanda
-        this.precoUnitario = item.getPrecoVenda();
-        this.subtotal = item.getTotal();
+        this.produtoId = item.getProduto() != null ? item.getProduto().getId() : null;
+        this.descricao = item.getProduto() != null && item.getProduto().getNome() != null ? item.getProduto().getNome() : "PRODUTO";
+        this.unMedida = item.getProduto() != null && item.getProduto().getUnidade() != null ? item.getProduto().getUnidade() : "UN";
+
+        // Converte a quantidade de Integer para BigDecimal com fallback 1
+        int qt = item.getQuantidade() != null ? item.getQuantidade() : 1;
+        this.quantidade = BigDecimal.valueOf(qt);
+
+        // Preço unitário: preferencialmente do item, senão do produto, senão zero
+        if (item.getPrecoVenda() != null) {
+            this.precoUnitario = item.getPrecoVenda();
+        } else if (item.getProduto() != null && item.getProduto().getPrecoVenda() != null) {
+            this.precoUnitario = item.getProduto().getPrecoVenda();
+        } else {
+            this.precoUnitario = BigDecimal.ZERO;
+        }
+
+        // Subtotal: assegura que existe um valor coerente
+        if (item.getTotal() != null) {
+            this.subtotal = item.getTotal();
+        } else {
+            this.subtotal = this.precoUnitario.multiply(this.quantidade);
+        }
+
+        // ====== Campos fiscais: preenche a partir do produto se existir, caso contrário usa defaults ======
+        if (item.getProduto() != null) {
+            Produto p = item.getProduto();
+            this.cfop = p.getCfop() != null && p.getCfop().getCodigo() != null ? p.getCfop().getCodigo() : "5102";
+            this.cst = p.getCst() != null && p.getCst().getCodigo() != null ? p.getCst().getCodigo() : "102";
+            this.origem = p.getOrigem() != null && p.getOrigem().getCodigo() != null ? p.getOrigem().getCodigo() : "0";
+
+            // Produto não tem NCM no modelo atual — mantém nulo ou default para validação
+            this.ncm = "00000000";
+
+            // Alíquotas ICMS podem estar em Produto (Double). Converte para BigDecimal com escala.
+            if (p.getAliquotaIcms() != null) {
+                this.aliqIcms = BigDecimal.valueOf(p.getAliquotaIcms()).setScale(2, RoundingMode.HALF_UP);
+            } else {
+                this.aliqIcms = BigDecimal.ZERO;
+            }
+
+            // PIS/COFINS não estão no Produto por padrão — usar 0.00 como fallback
+            this.aliqPis = BigDecimal.ZERO;
+            this.aliqCofins = BigDecimal.ZERO;
+
+        } else {
+            // Sem produto: usa defaults simples para permitir validação
+            this.cfop = "5102";
+            this.cst = "102";
+            this.origem = "0";
+            this.ncm = "00000000";
+            this.aliqIcms = BigDecimal.ZERO;
+            this.aliqPis = BigDecimal.ZERO;
+            this.aliqCofins = BigDecimal.ZERO;
+        }
+
+        // Calcula valores dos tributos com base no subtotal e nas alíquotas (dividindo por 100)
+        this.valorIcms = this.subtotal.multiply(this.aliqIcms).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        this.valorPis = this.subtotal.multiply(this.aliqPis).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        this.valorCofins = this.subtotal.multiply(this.aliqCofins).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
     }
 
     /* =================== Getters & Setters =================== */

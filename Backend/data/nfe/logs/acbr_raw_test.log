@@ -1,0 +1,24 @@
+﻿2025-11-24 06:56:28.878 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121220015450.xml",1,1,1)
+2025-11-24 06:56:31.694 | CONNECT-ERROR: Exceção ao chamar "Connect" com "2" argumento(s): "Este host não é conhecido"
+2025-11-24 07:04:04.460 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121220015450.xml",1,1,1)
+2025-11-24 07:04:05.019 | SENT  bytes
+2025-11-24 07:04:07.691 | READ-EX: Não é possível ler os dados da conexão de transporte: Uma tentativa de conexão falhou porque o componente conectado não respondeu
+corretamente após um período de tempo ou a conexão estabelecida falhou
+porque o host conectado não respondeu.
+2025-11-24 07:04:09.950 | READ-EX: Não é possível ler os dados da conexão de transporte: Uma tentativa de conexão falhou porque o componente conectado não respondeu
+corretamente após um período de tempo ou a conexão estabelecida falhou
+porque o host conectado não respondeu.
+2025-11-24 07:04:10.179 | NO-RESPONSE
+2025-11-24 07:04:43.139 | CMD: NFe.CriarEnviarNFe("C:\controle-bares-restaurantes\Backend\data\nfe\xml\NFe_35251161134978000130650010000001121220015450.xml",1,1,1)
+2025-11-24 07:04:43.243 | SENT  bytes
+2025-11-24 07:04:45.879 | READ-EX: Não é possível ler os dados da conexão de transporte: Uma tentativa de conexão falhou porque o componente conectado não respondeu
+corretamente após um período de tempo ou a conexão estabelecida falhou
+porque o host conectado não respondeu.
+2025-11-24 07:04:48.095 | READ-EX: Não é possível ler os dados da conexão de transporte: Uma tentativa de conexão falhou porque o componente conectado não respondeu
+corretamente após um período de tempo ou a conexão estabelecida falhou
+porque o host conectado não respondeu.
+2025-11-24 07:04:50.325 | READ-EX: Não é possível ler os dados da conexão de transporte: Uma tentativa de conexão falhou porque o componente conectado não respondeu
+corretamente após um período de tempo ou a conexão estabelecida falhou
+porque o host conectado não respondeu.
+2025-11-24 07:04:50.571 | RESPONSE-LEN: 143
+2025-11-24 07:04:50.626 | RESPONSE: ACBrMonitorPLUS Ver. 1.4.0.374 - x86\\nConectado em: 24/11/25 07:04:43\\nMaquina: 127.0.0.1\\nEsperando por comandos.ERRO: Tempo de Uso Expirou!

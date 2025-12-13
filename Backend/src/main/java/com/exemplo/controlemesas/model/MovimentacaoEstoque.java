@@ -2,6 +2,7 @@ package com.exemplo.controlemesas.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import jakarta.persistence.*;
 
@@ -13,7 +14,7 @@ public class MovimentacaoEstoque {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "produto_id")
 	private Produto produto;
 
@@ -29,6 +30,9 @@ public class MovimentacaoEstoque {
 
 	@Column(length = 255)
 	private String observacao;
+
+	@Version
+	private Long version;
 
 	/* --- enum --- */
 	public enum TipoMovimentacao {
@@ -83,5 +87,27 @@ public class MovimentacaoEstoque {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
+	}
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MovimentacaoEstoque)) return false;
+		MovimentacaoEstoque that = (MovimentacaoEstoque) o;
+		return id != null && Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		// use id when available to satisfy equals/hashCode contract
+		return java.util.Objects.hashCode(id);
 	}
 }

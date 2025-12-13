@@ -1,28 +1,25 @@
 // services/comandaService.ts
-import axios from 'axios';
+import api from './api';
 import { ComandaDTO } from '../types/ComandaDTO';
 import { ComandaResumo } from "@/types/ComandaResumo";
-const API = '/api/comandas';
-
-
+const API = '/comandas';
 
 export async function buscarResumoComanda(comandaId: number): Promise<ComandaResumo[]> {
-  const response = await axios.get(`/api/comandas/${comandaId}/resumo`);
+  const response = await api.get(`${API}/${comandaId}/resumo`);
   return response.data;
 }
 
-
 export async function listarComandas(): Promise<ComandaDTO[]> {
-  const response = await axios.get(API);
+  const response = await api.get(API);
   return response.data;
 }
 
 export async function criarComanda(mesaId: number): Promise<ComandaDTO> {
-  const response = await axios.post(API, { mesaId });
+  const response = await api.post(`${API}/criar/${mesaId}`);
   return response.data;
 }
 
 export async function fecharComanda(id: number): Promise<ComandaDTO> {
-  const response = await axios.put(`${API}/${id}/fechar`);
+  const response = await api.put(`${API}/${id}/fechar`);
   return response.data;
 }
